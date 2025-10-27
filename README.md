@@ -6,7 +6,8 @@
 
 <div align="center">
 
-https://github.com/SalehGNUTUX/GT-QURANREADER/raw/main/gt-quranreader.png
+<img width="256" height="256" alt="image" src="https://github.com/user-attachments/assets/c229d4c1-ad50-4bef-b6f0-e211b87c2b6f" />
+
 **عارض قرآن كريم متكامل مع واجهة عربية بديعة، ميزات صوتية متقدمة، وتصميم متجاوب لجميع الأجهزة.**
 
 [المميزات](#-المميزات-الرئيسية) • [التشغيل](#-طريقة-التشغيل) • [التثبيت](#-التثبيت-في-قائمة-البرامج) • [البناء](#-البناء-من-المصدر)
