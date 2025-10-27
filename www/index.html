@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GT-QURANREADER - عارض القرآن الكريم</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- أيقونة القرآن الكريم -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-book-quran"></i> GT-QURANREADER</h1>
+            <h2>عارض القرآن الكريم المتكامل</h2>
+        </header>
+
+        <!-- شريط البحث -->
+        <div class="search-section">
+            <div id="search-bar">
+                <input type="text" id="search-input" placeholder="ابحث في السور، الآيات، الأجزاء أو الأحزاب...">
+                <button id="search-btn"><i class="fas fa-search"></i> بحث</button>
+            </div>
+            <div class="quick-nav">
+                <button id="nav-juz" class="nav-option"><i class="fas fa-list"></i> الأجزاء</button>
+                <button id="nav-surah" class="nav-option"><i class="fas fa-quran"></i> السور</button>
+                <button id="nav-sajda" class="nav-option"><i class="fas fa-prostration"></i> آيات السجود</button>
+            </div>
+        </div>
+
+        <!-- نتائج البحث -->
+        <div id="search-results" class="search-results" style="display: none;"></div>
+
+        <!-- معلومات الصفحة -->
+        <div class="page-info">
+            <div id="page-details" class="page-details">
+                <span id="surah-info"></span>
+                <span id="juz-info"></span>
+            </div>
+            <div id="page-number" class="page-number">الصفحة: 1</div>
+        </div>
+
+        <!-- عناصر التحكم في النص -->
+        <div class="text-controls">
+            <button id="zoom-out" class="zoom-btn" title="تصغير النص">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <span id="zoom-level">100%</span>
+            <button id="zoom-in" class="zoom-btn" title="تكبير النص">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button id="reset-zoom" class="zoom-btn" title="إعادة التعيين">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+
+        <!-- صفحة القرآن -->
+        <div class="quran-page">
+            <img id="quran-img" src="quran_data/data/quran_image/1.png" alt="صفحة القرآن">
+        </div>
+
+        <!-- الفوتر -->
+        <footer class="page-footer">
+            <div class="footer-content">
+                <p class="footer-text">
+                    جميع الحقوق محفوظة © 2025 | القارئ القرآني - GT-QURANREADER
+                </p>
+                <p class="footer-subtext">
+                    صمم بحب <span class="heart">♥️</span> لخدمة المسلمين
+                </p>
+                <p class="footer-developer">
+                    تم التطوير بواسطة:
+                    <a href="https://github.com/SalehGNUTUX" target="_blank" class="developer-link">
+                        GNUTUX
+                    </a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- الأزرار العائمة -->
+    <div class="floating-controls">
+        <div class="floating-main-buttons">
+            <button id="prev-page-btn" class="floating-btn" title="الصفحة السابقة">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button id="toggle-theme" class="floating-btn" title="تبديل الوضع">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="audio-toggle" class="floating-btn" title="تشغيل التلاوة">
+                <i class="fas fa-play"></i>
+            </button>
+            <button id="next-page-btn" class="floating-btn" title="الصفحة التالية">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+
+        <button id="scroll-to-top" class="floating-btn scroll-top-btn" title="الصعود للأعلى">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+    </div>
+
+    <!-- مشغل الصوت العائم -->
+    <div class="audio-player-floating">
+        <div class="audio-header">
+            <span><i class="fas fa-music"></i> التلاوة</span>
+            <button id="close-audio"><i class="fas fa-times"></i></button>
+        </div>
+        <audio id="quran-audio" controls>
+            المتصفح لا يدعم تشغيل الصوت
+        </audio>
+        <div class="audio-info" id="audio-info">
+            جاري التحميل...
+        </div>
+    </div>
+
+    <!-- قائمة السور -->
+    <div id="surah-list" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3><i class="fas fa-quran"></i> قائمة السور</h3>
+            <div id="surah-list-content" class="modal-list"></div>
+        </div>
+    </div>
+
+    <!-- قائمة الأجزاء -->
+    <div id="juz-list" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3><i class="fas fa-list"></i> قائمة الأجزاء</h3>
+            <div id="juz-list-content" class="modal-list"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
