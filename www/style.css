@@ -500,11 +500,11 @@ animation: pulse 2s infinite;
     background: #d35400;
 }
 
-/* مشغل الصوت العائم - الجانب الأيسر */
+/* مشغل الصوت العائم - تم تعديل موقعه */
 .audio-player-floating {
     position: fixed;
-    top: 20px;
-    left: 20px;
+    bottom: 30px;
+    left: 30px;
     background: var(--card-bg-light);
     padding: 20px;
     border-radius: var(--border-radius);
@@ -522,13 +522,13 @@ body.dark-mode .audio-player-floating {
 
 .audio-player-floating.show {
     display: block;
-    animation: slideIn 0.3s ease;
+    animation: slideInUp 0.3s ease;
 }
 
-@keyframes slideIn {
+@keyframes slideInUp {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -708,6 +708,87 @@ body.dark-mode .juz-item {
     opacity: 0.8;
 }
 
+/* أنماط اختيار السورة للصوت */
+.audio-selection-info {
+    background: rgba(46, 134, 171, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-right: 4px solid var(--accent-color);
+}
+
+.audio-selection-info p {
+    margin: 0;
+    color: var(--text-color-light);
+    font-size: 0.95em;
+}
+
+body.dark-mode .audio-selection-info p {
+    color: var(--text-color-dark);
+}
+
+.surah-audio-item {
+    padding: 15px 20px;
+    background: var(--bg-color-light);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body.dark-mode .surah-audio-item {
+    background: var(--card-bg-dark);
+    border-color: rgba(255,255,255,0.1);
+}
+
+.surah-audio-item:hover {
+    background-color: var(--accent-color);
+    color: white;
+    transform: translateX(-5px);
+}
+
+.surah-audio-info {
+    flex: 1;
+}
+
+.surah-audio-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.surah-audio-details {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.surah-audio-item:hover .surah-audio-details {
+    opacity: 1;
+}
+
+.play-audio-icon {
+    background: var(--success-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.surah-audio-item:hover .play-audio-icon {
+    background: white;
+    color: var(--success-color);
+    transform: scale(1.1);
+}
+
 /* شريط التمرير المخصص */
 .modal-list::-webkit-scrollbar,
 .search-results::-webkit-scrollbar {
@@ -802,8 +883,7 @@ body.dark-mode .floating-btn:hover {
 
     .audio-player-floating {
         position: fixed;
-        top: auto;
-        bottom: 160px;
+        bottom: 20px;
         left: 20px;
         right: 20px;
         min-width: auto;
@@ -855,7 +935,7 @@ body.dark-mode .floating-btn:hover {
     }
 
     .audio-player-floating {
-        bottom: 140px;
+        bottom: 15px;
         left: 15px;
         right: 15px;
     }
