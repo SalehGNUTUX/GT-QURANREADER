@@ -56,9 +56,20 @@
             </button>
         </div>
 
-        <!-- صفحة القرآن -->
+        <!-- صفحة القرآن (وضع الصور) -->
         <div class="quran-page">
             <img id="quran-img" src="quran_data/data/quran_image/1.png" alt="صفحة القرآن">
+        </div>
+
+        <!-- صفحة القرآن (وضع النص) -->
+        <div id="text-display" class="quran-text-page" style="display: none;">
+            <div class="text-page-header">
+                <h3 id="text-surah-name">سورة الفاتحة</h3>
+                <div id="text-page-info">الصفحة 1 - الجزء 1</div>
+            </div>
+            <div id="quran-text-content" class="quran-text-content">
+                <!-- سيتم ملء النص ديناميكياً -->
+            </div>
         </div>
 
         <!-- الفوتر -->
@@ -86,11 +97,20 @@
             <button id="prev-page-btn" class="floating-btn" title="الصفحة السابقة">
                 <i class="fas fa-arrow-right"></i>
             </button>
+            <button id="toggle-display-mode" class="floating-btn" title="تبديل إلى النص">
+                <i class="fas fa-font"></i>
+            </button>
             <button id="toggle-theme" class="floating-btn" title="تبديل الوضع">
                 <i class="fas fa-moon"></i>
             </button>
             <button id="audio-toggle" class="floating-btn" title="تشغيل التلاوة">
                 <i class="fas fa-play"></i>
+            </button>
+            <button id="font-selector-btn" class="floating-btn" title="اختر خط القرآن">
+                <i class="fas fa-font"></i>
+            </button>
+            <button id="reader-selector-btn" class="floating-btn" title="اختر القارئ">
+                <i class="fas fa-user"></i>
             </button>
             <button id="next-page-btn" class="floating-btn" title="الصفحة التالية">
                 <i class="fas fa-arrow-left"></i>
@@ -143,6 +163,66 @@
                 <p>هذه الصفحة تحتوي على أكثر من سورة. اختر السورة التي تريد تشغيل تلاوتها:</p>
             </div>
             <div id="surah-selection-list" class="modal-list"></div>
+        </div>
+    </div>
+
+    <!-- نافذة اختيار الخط -->
+    <div id="font-selector" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3><i class="fas fa-font"></i> اختر خط القرآن</h3>
+            <div class="font-options">
+                <div class="font-option" data-font="uthmanic">
+                    <div class="font-preview" style="font-family: UthmanicHafs">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                    </div>
+                    <div class="font-info">
+                        <div class="font-name">الخط العثماني</div>
+                        <div class="font-desc">الخط الرسمي لمصحف المدينة</div>
+                    </div>
+                </div>
+
+                <div class="font-option" data-font="amiri">
+                    <div class="font-preview" style="font-family: AmiriQuran">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                    </div>
+                    <div class="font-info">
+                        <div class="font-name">خط أميري</div>
+                        <div class="font-desc">خط واضح للقراءة اليومية</div>
+                    </div>
+                </div>
+
+                <div class="font-option" data-font="amiri-colored">
+                    <div class="font-preview" style="font-family: AmiriQuranColored">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                    </div>
+                    <div class="font-info">
+                        <div class="font-name">خط أميري ملون</div>
+                        <div class="font-desc">ملون مع تشكيل واضح</div>
+                    </div>
+                </div>
+
+                <div class="font-option" data-font="arbfonts-amiri">
+                    <div class="font-preview" style="font-family: ArbFONTSAmiri">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                    </div>
+                    <div class="font-info">
+                        <div class="font-name">خط أميري Arb</div>
+                        <div class="font-desc">خط أميري بديل</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة اختيار القارئ -->
+    <div id="reader-selector" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3><i class="fas fa-user"></i> اختر القارئ</h3>
+            <div id="readers-list" class="modal-list">
+                <!-- سيتم ملء القائمة ديناميكياً -->
+            </div>
         </div>
     </div>
 
