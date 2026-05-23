@@ -1,8 +1,0 @@
-gt-quranreader/
-├── gt-quranreader.sh          (البرنامج الرئيسي - يحمّل البيانات تلقائياً)
-├── README.md
-├── LICENSE
-└── www/                       (الواجهة فقط)
-    ├── index.html
-    ├── style.css
-    └── script.js
