@@ -1,0 +1,42 @@
+{
+  "name": "@gt-quranreader/web",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "author": "SalehGNUTUX",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit",
+    "cap:sync": "npm run build && cap sync",
+    "cap:android:add": "npm run build && cap add android",
+    "cap:android:open": "cap open android",
+    "cap:android:run": "npm run build && cap sync android && cap run android",
+    "cap:ios:add": "npm run build && cap add ios",
+    "cap:ios:open": "cap open ios",
+    "cap:ios:run": "npm run build && cap sync ios && cap run ios"
+  },
+  "dependencies": {
+    "@gt-quranreader/core": "*",
+    "@gt-quranreader/ui": "*",
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/filesystem": "^6.0.2",
+    "@capacitor/ios": "^6.2.0",
+    "@capacitor/status-bar": "^6.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7",
+    "vite-plugin-pwa": "^0.21.1",
+    "workbox-window": "^7.3.0"
+  }
+}

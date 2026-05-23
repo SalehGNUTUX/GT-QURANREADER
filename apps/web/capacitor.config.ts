@@ -1,0 +1,27 @@
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.gnutux.gtquranreader',
+  appName: 'GT-QURANREADER',
+  webDir: 'dist',
+  android: {
+    allowMixedContent: false,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
+  },
+  ios: {
+    contentInset: 'always',
+    scrollEnabled: true,
+  },
+  server: {
+    androidScheme: 'https',
+  },
+  plugins: {
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#1a1a2e',
+    },
+  },
+};
+
+export default config;
