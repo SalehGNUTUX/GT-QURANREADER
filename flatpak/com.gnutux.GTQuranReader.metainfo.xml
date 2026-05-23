@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.gnutux.GTQuranReader</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>GT-QURANREADER</name>
+  <name xml:lang="ar">عارض و قارئ الذكر الحكيم</name>
+  <summary>Quran reader with verse-by-verse highlighting</summary>
+  <summary xml:lang="ar">عارض القرآن الكريم — تظليل آية متزامن مع التلاوة</summary>
+  <description>
+    <p>
+      GT-QURANREADER is a complete Quran reading application supporting 4 riwayat
+      (Warsh, Hafs, Qaloon, Al-Duri), 13+ reciters, verse-by-verse audio highlighting,
+      and intelligent Arabic search with full diacritics normalization.
+    </p>
+    <p xml:lang="ar">
+      تطبيق متكامل لقراءة القرآن الكريم. يدعم 4 روايات (ورش، حفص، قالون، الدوري)
+      وأكثر من 13 قارئاً. يوفر تظليل آية متزامن مع التلاوة، بحثاً ذكياً بتطبيع
+      عربي كامل (يجد "الرحمن" مهما كُتبت)، 6 خطوط قرآنية، 5 سمات بصرية،
+      ويعمل دون اتصال بعد التنزيل.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>4 riwayat from api.alquran.cloud (Warsh, Hafs, Qaloon, Al-Duri)</li>
+      <li>13+ reciters via everyayah.com (verse-by-verse audio)</li>
+      <li>Synchronized verse highlighting with playback</li>
+      <li>Smart Arabic search (2:255, surah names, kunya like "الكرسي")</li>
+      <li>6 Quranic fonts (Uthmanic, Amiri, Amiri Colored, ArbFONTS, ...)</li>
+      <li>5 themes (Gold, Dark, Light, Sepia, Auto)</li>
+      <li>Full offline support after downloading the content</li>
+      <li>Responsive UI for desktop and tablet</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">com.gnutux.GTQuranReader.desktop</launchable>
+  <url type="homepage">https://github.com/SalehGNUTUX/GT-QURANREADER</url>
+  <url type="bugtracker">https://github.com/SalehGNUTUX/GT-QURANREADER/issues</url>
+  <developer_name>SalehGNUTUX</developer_name>
+  <developer id="com.gnutux">
+    <name>SalehGNUTUX</name>
+  </developer>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="4.0.0" date="2026-05-23">
+      <description>
+        <p>First stable release of v4.0 — full monorepo rebuild.</p>
+        <p xml:lang="ar">أول إصدار مستقر لـ v4.0 — إعادة بناء كاملة بهيكلية monorepo.</p>
+      </description>
+    </release>
+  </releases>
+  <categories>
+    <category>Education</category>
+    <category>Languages</category>
+  </categories>
+  <keywords>
+    <keyword>quran</keyword>
+    <keyword>islam</keyword>
+    <keyword>arabic</keyword>
+    <keyword>mushaf</keyword>
+    <keyword>tilawah</keyword>
+  </keywords>
+</component>

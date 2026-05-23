@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=GT-QURANREADER
+Name[ar]=عارض و قارئ الذكر الحكيم
+GenericName=Quran Reader
+GenericName[ar]=عارض القرآن الكريم
+Comment=Quran reader with 4 riwayat, verse-by-verse highlighting and smart Arabic search
+Comment[ar]=عارض القرآن الكريم — 4 روايات، 13 قارئاً، تظليل آية متزامن، بحث ذكي
+Exec=gt-quranreader
+Icon=com.gnutux.GTQuranReader
+Terminal=false
+Categories=Education;Languages;Literature;
+Keywords=quran;islam;arabic;mushaf;tilawah;recitation;
+StartupNotify=true
+StartupWMClass=GT-QURANREADER

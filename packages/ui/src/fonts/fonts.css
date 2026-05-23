@@ -1,0 +1,46 @@
+/* خط الواجهة (Tajawal) — عربي عصري مريح للقوائم والأزرار والوصف. */
+@font-face {
+  font-family: 'Tajawal';
+  src: url('/fonts/Tajawal-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajawal';
+  src: url('/fonts/Tajawal-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajawal';
+  src: url('/fonts/Tajawal-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* الخطوط القرآنية (للنص الكريم نفسه). */
+@font-face {
+  font-family: 'UthmanicHafs1';
+  src: url('/fonts/UthmanicHafs1 Ver13.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AmiriQuran';
+  src: url('/fonts/amiri-quran.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AmiriQuranColored';
+  src: url('/fonts/amiri-quran-colored.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ArbFONTSAmiri';
+  src: url('/fonts/ArbFONTS-Amiri Quran.ttf') format('truetype');
+  font-display: swap;
+}

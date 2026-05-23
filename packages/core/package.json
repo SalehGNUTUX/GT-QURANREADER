@@ -1,0 +1,13 @@
+{
+  "name": "@gt-quranreader/core",
+  "version": "4.0.0",
+  "description": "GT-QURANREADER shared core: data, types, search, API clients, audio player",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*"
+  },
+  "license": "GPL-3.0-or-later"
+}

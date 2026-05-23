@@ -1,0 +1,64 @@
+# GT-QURANREADER — Flatpak manifest
+# يستخرج محتوى AppImage الموجود في release/ ويغلّفه كحزمة Flatpak.
+# يستلزم بناء AppImage أولاً عبر: bash scripts/build-packages.sh appimage
+
+app-id: com.gnutux.GTQuranReader
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: gt-quranreader
+separate-locales: false
+
+finish-args:
+  # Wayland + X11 fallback
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+  # الصوت (تشغيل التلاوات)
+  - --socket=pulseaudio
+  # الإنترنت (لجلب النص + الصوت من الـ APIs)
+  - --share=network
+  # حفظ الإعدادات والبيانات (~/.config/GT-QURANREADER)
+  - --filesystem=xdg-config/GT-QURANREADER:create
+  # تنزيل النصوص والصور والصوت المحلية
+  - --filesystem=xdg-data/GT-QURANREADER:create
+  # alias الذي تطلبه Electron sandbox
+  - --talk-name=org.freedesktop.Notifications
+
+modules:
+  - name: gt-quranreader
+    buildsystem: simple
+    build-commands:
+      # استخراج AppImage بدون تشغيله
+      - chmod +x GT-QURANREADER.AppImage
+      - ./GT-QURANREADER.AppImage --appimage-extract
+      # نقل المحتوى إلى /app
+      - mkdir -p /app/bin /app/share/applications /app/share/metainfo /app/share/icons/hicolor/scalable/apps /app/lib/gt-quranreader
+      - cp -a squashfs-root/. /app/lib/gt-quranreader/
+      # مذكرة تنفيذية للأمر `gt-quranreader`
+      - install -Dm755 launcher.sh /app/bin/gt-quranreader
+      # الملفات الميتاداتا
+      - install -Dm644 com.gnutux.GTQuranReader.desktop /app/share/applications/com.gnutux.GTQuranReader.desktop
+      - install -Dm644 com.gnutux.GTQuranReader.metainfo.xml /app/share/metainfo/com.gnutux.GTQuranReader.metainfo.xml
+      # الأيقونة بأحجام Flatpak المسموحة (≤512px فقط)
+      - |
+        for size in 16 32 48 64 128 256 512; do
+          SRC="squashfs-root/usr/share/icons/hicolor/${size}x${size}/apps/@gt-quranreaderdesktop.png"
+          if [ -f "$SRC" ]; then
+            install -Dm644 "$SRC" \
+              "/app/share/icons/hicolor/${size}x${size}/apps/com.gnutux.GTQuranReader.png"
+          fi
+        done
+    sources:
+      - type: file
+        path: ../release/GT-QURANREADER-4.0.0-x86_64.AppImage
+        dest-filename: GT-QURANREADER.AppImage
+      - type: file
+        path: com.gnutux.GTQuranReader.desktop
+      - type: file
+        path: com.gnutux.GTQuranReader.metainfo.xml
+      - type: script
+        dest-filename: launcher.sh
+        commands:
+          - exec /app/lib/gt-quranreader/@gt-quranreaderdesktop --no-sandbox "$@"

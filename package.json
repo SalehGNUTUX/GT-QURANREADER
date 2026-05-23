@@ -1,0 +1,67 @@
+{
+  "name": "gt-quranreader-monorepo",
+  "version": "4.0.0",
+  "private": true,
+  "description": "GT-QURANREADER — عارض القرآن الكريم بنواة وواجهة موحَّدتين لـ Linux (Electron) + Web (PWA) + Android/iOS (Capacitor). 4 روايات، 13+ قارئاً، تظليل آية متزامن، بحث ذكي بتطبيع عربي كامل.",
+  "license": "GPL-3.0-or-later",
+  "author": "SalehGNUTUX <https://github.com/SalehGNUTUX>",
+  "homepage": "https://github.com/SalehGNUTUX/GT-QURANREADER",
+  "bugs": {
+    "url": "https://github.com/SalehGNUTUX/GT-QURANREADER/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalehGNUTUX/GT-QURANREADER.git"
+  },
+  "keywords": [
+    "quran",
+    "قرآن",
+    "mushaf",
+    "مصحف",
+    "tilawah",
+    "تلاوة",
+    "warsh",
+    "ورش",
+    "hafs",
+    "حفص",
+    "qaloon",
+    "aldoori",
+    "islamic",
+    "electron",
+    "pwa",
+    "react",
+    "typescript",
+    "capacitor",
+    "android",
+    "ios",
+    "verse-by-verse",
+    "audio-highlighting",
+    "everyayah",
+    "alquran-cloud",
+    "monorepo"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:desktop": "npm --workspace=apps/desktop run dev:electron",
+    "dev:web": "npm --workspace=apps/web run dev",
+    "build:desktop": "npm --workspace=apps/desktop run build",
+    "build:web": "npm --workspace=apps/web run build",
+    "build:linux": "npm --workspace=apps/desktop run build:linux",
+    "build": "npm run build:desktop && npm run build:web",
+    "lint": "npm --workspaces --if-present run lint",
+    "test:e2e": "tsx scripts/test-search-and-audio.ts",
+    "test:visual": "tsx scripts/visual-check.ts",
+    "clean": "rimraf apps/*/dist apps/*/dist-electron node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  }
+}

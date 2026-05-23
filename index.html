@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="gold">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1c1410" />
+  <meta name="description" content="GT-QuranReader — عارض و قارئ الذكر الحكيم. تطبيق متكامل بأربع روايات وأكثر من 13 قارئاً مع تظليل آية متزامن. متاح لـ GNU/Linux وأندرويد والمتصفح." />
+  <title>GT-QuranReader — مستعرض و قارئ الذكر الحكيم</title>
+
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #1c1410;
+      --bg-elev: #2a1f17;
+      --fg: #f5e6c8;
+      --fg-muted: #c9b896;
+      --accent: #d4af37;
+      --accent-hover: #b8942b;
+      --accent-soft: rgba(212, 175, 55, 0.15);
+      --border: rgba(212, 175, 55, 0.25);
+      --card-bg: rgba(42, 31, 23, 0.7);
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      --glow: 0 0 40px rgba(212, 175, 55, 0.3);
+    }
+
+    html.dark {
+      --bg: #0f1014;
+      --bg-elev: #1a1b21;
+      --fg: #e6e8f0;
+      --fg-muted: #9aa1ad;
+      --accent: #7b8cf7;
+      --accent-hover: #5e72f0;
+      --accent-soft: rgba(123, 140, 247, 0.12);
+      --border: rgba(255, 255, 255, 0.1);
+      --card-bg: rgba(26, 27, 33, 0.85);
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      --glow: 0 0 30px rgba(123, 140, 247, 0.25);
+    }
+
+    html.light {
+      --bg: #f7f7fb;
+      --bg-elev: #ffffff;
+      --fg: #1c1c25;
+      --fg-muted: #5e5e6b;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-soft: rgba(79, 70, 229, 0.1);
+      --border: rgba(0, 0, 0, 0.08);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      --glow: 0 0 30px rgba(79, 70, 229, 0.15);
+    }
+
+    html.sepia {
+      --bg: #c9b78f;
+      --bg-elev: #bfac82;
+      --fg: #3b2d1a;
+      --fg-muted: #6b563a;
+      --accent: #7a4d24;
+      --accent-hover: #5e3a1a;
+      --accent-soft: rgba(122, 77, 36, 0.12);
+      --border: rgba(122, 77, 36, 0.22);
+      --card-bg: rgba(201, 183, 143, 0.85);
+      --shadow: 0 4px 16px rgba(59, 45, 26, 0.12);
+      --glow: 0 0 14px rgba(122, 77, 36, 0.14);
+    }
+
+    html.sepia body {
+      background: linear-gradient(180deg, #c9b78f 0%, #b9a47a 100%);
+      background-attachment: fixed;
+    }
+
+    html.sepia .logo-hero {
+      filter: drop-shadow(0 4px 20px rgba(74, 58, 38, 0.18));
+    }
+
+    html.sepia .accent-text {
+      animation: none;
+      background: none;
+      -webkit-text-fill-color: var(--accent);
+      color: var(--accent);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      overflow-x: hidden;
+    }
+
+    html.gold body {
+      background: radial-gradient(ellipse at top, #2a1f17 0%, #1c1410 50%, #0d0805 100%);
+      background-attachment: fixed;
+    }
+
+    .accent-text {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--fg) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shimmer 6s linear infinite;
+    }
+
+    @keyframes shimmer {
+      to { background-position: 200% center; }
+    }
+
+    .logo-hero {
+      filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.4));
+      animation: float 5s ease-in-out infinite;
+    }
+
+    html.dark .logo-hero { filter: drop-shadow(0 0 60px rgba(123, 140, 247, 0.35)); }
+    html.light .logo-hero { filter: drop-shadow(0 0 50px rgba(79, 70, 229, 0.25)); }
+    html.sepia .logo-hero { filter: drop-shadow(0 0 50px rgba(160, 82, 45, 0.35)); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.01); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow), 0 0 20px var(--accent-soft);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: var(--bg);
+      font-weight: 700;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px var(--accent-soft);
+    }
+
+    html.light .btn-primary, html.sepia .btn-primary {
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--accent-soft), var(--glow);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+    }
+
+    .download-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-radius: 1rem;
+    }
+
+    .download-card .icon {
+      color: var(--accent);
+      transition: transform 0.4s ease;
+    }
+
+    .download-card:hover .icon {
+      transform: scale(1.15) rotate(-3deg);
+    }
+
+    .theme-switcher {
+      position: fixed;
+      top: 1rem;
+      inset-inline-start: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      z-index: 50;
+    }
+
+    .theme-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      background: transparent;
+      color: var(--fg);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+
+    .theme-btn:hover {
+      background: var(--accent-soft);
+    }
+
+    .theme-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    html.light .theme-btn.active, html.sepia .theme-btn.active {
+      color: #fff;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--fg-muted);
+      font-size: 1.125rem;
+      margin-bottom: 3rem;
+      max-width: 42rem;
+      margin-inline: auto;
+    }
+
+    .feature-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 1rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .section-title { font-size: 1.875rem; }
+      .theme-switcher { top: auto; bottom: 1rem; }
+    }
+
+    /* روابط داخلية تمرّر بسلاسة بعيداً عن الهيدر */
+    section { scroll-margin-top: 80px; }
+
+    /* خط قرآني للآيات */
+    .quran-text {
+      font-family: 'Amiri Quran', 'Amiri', 'Tajawal', serif;
+      font-weight: 400;
+      line-height: 2.4;
+      letter-spacing: 0.02em;
+      direction: rtl;
+    }
+
+    .verse-banner {
+      padding: 1.75rem 1rem 1rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--accent-soft) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .verse-banner .verse-text {
+      font-size: 1.55rem;
+      color: var(--accent);
+      max-width: 50rem;
+      margin-inline: auto;
+      margin-bottom: 0.6rem;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+      transition: opacity 0.6s ease;
+    }
+
+    .verse-banner .verse-ref {
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      letter-spacing: 0.04em;
+      transition: opacity 0.6s ease;
+    }
+
+    .verse-banner.fading .verse-text,
+    .verse-banner.fading .verse-ref {
+      opacity: 0;
+    }
+
+    @media (max-width: 640px) {
+      .verse-banner .verse-text { font-size: 1.2rem; line-height: 2.1; }
+      .verse-banner { padding: 1.25rem 1rem 0.75rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="verse-banner" id="verseBanner">
+    <p class="quran-text verse-text" id="verseText">
+      ﴿ إِن تُقۡرِضُواْ ٱللَّهَ قَرۡضًا حَسَنٗا يُضَٰعِفۡهُ لَكُمۡ وَيَغۡفِرۡ لَكُمۡۚ وَٱللَّهُ شَكُورٌ حَلِيمٌ ﴾
+    </p>
+    <p class="verse-ref" id="verseRef">— سورة التغابن، الآية 17</p>
+  </div>
+
+  <div class="theme-switcher" role="toolbar" aria-label="تبديل السمة">
+    <button data-theme="gold" class="theme-btn" title="ذهبي" aria-label="السمة الذهبية">🏺</button>
+    <button data-theme="dark" class="theme-btn" title="ليلي" aria-label="السمة الليلية">🌙</button>
+    <button data-theme="light" class="theme-btn" title="نهاري" aria-label="السمة النهارية">☀️</button>
+    <button data-theme="sepia" class="theme-btn" title="سيبيا" aria-label="السمة السيبيا">📜</button>
+    <button data-theme="auto" class="theme-btn" title="تلقائي" aria-label="السمة التلقائية">🔄</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!--                              Hero                                       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section class="min-h-screen flex flex-col items-center justify-center px-4 py-20 text-center">
+    <img src="logo.png" alt="GT-QuranReader — مستعرض و قارئ الذكر الحكيم" class="logo-hero w-72 md:w-96 lg:w-[28rem] mb-8 rounded-3xl" />
+
+    <h1 class="text-4xl md:text-6xl lg:text-7xl font-black mb-6 accent-text leading-tight">
+      GT-QuranReader
+    </h1>
+
+    <p class="text-xl md:text-2xl lg:text-3xl font-bold mb-4" style="color: var(--accent)">
+      مستعرض و قارئ الذكر الحكيم
+    </p>
+
+    <p class="text-base md:text-lg max-w-2xl mb-10" style="color: var(--fg-muted)">
+      تطبيق متكامل لقراءة القرآن الكريم. يدعم 4 روايات معتمدة وأكثر من 13 قارئاً
+      مع تظليل آية متزامن مع التلاوة وبحث عربي ذكي بتطبيع كامل للهمزات والتشكيل.
+    </p>
+
+    <div class="flex flex-wrap gap-4 justify-center mb-6">
+      <a href="./app/" class="btn-primary px-8 py-4 rounded-xl text-lg">
+        <i class="fa-solid fa-globe ml-2"></i>
+        جرّب نسخة الويب (v4)
+      </a>
+      <a href="#downloads" class="btn-secondary px-8 py-4 rounded-xl text-lg">
+        <i class="fa-solid fa-download ml-2"></i>
+        التنزيلات
+      </a>
+      <a href="https://github.com/SalehGNUTUX/GT-QURANREADER" target="_blank" rel="noopener" class="btn-secondary px-8 py-4 rounded-xl text-lg">
+        <i class="fa-brands fa-github ml-2"></i>
+        المستودع
+      </a>
+    </div>
+
+    <div class="flex flex-wrap gap-3 justify-center mb-12 text-sm">
+      <a href="https://salehgnutux.github.io/GT-QURANREADER-WEB/" target="_blank" rel="noopener"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition hover:opacity-80"
+         style="background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border)">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        النسخة القديمة (v3 — Vanilla JS)
+        <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
+      </a>
+    </div>
+
+    <div class="flex flex-wrap gap-4 justify-center text-sm" style="color: var(--fg-muted)">
+      <span><i class="fa-solid fa-book-open ml-1"></i> 4 روايات</span>
+      <span class="opacity-50">•</span>
+      <span><i class="fa-solid fa-microphone ml-1"></i> 13+ قارئاً</span>
+      <span class="opacity-50">•</span>
+      <span><i class="fa-solid fa-palette ml-1"></i> 5 سمات</span>
+      <span class="opacity-50">•</span>
+      <span><i class="fa-solid fa-font ml-1"></i> 6 خطوط</span>
+      <span class="opacity-50">•</span>
+      <span><i class="fa-solid fa-wifi-slash ml-1"></i> يعمل أيضاً في وضع عدم الاتصال</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!--                              Features                                   -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="features" class="py-24 px-4">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="section-title accent-text">المزايا الرئيسية</h2>
+      <p class="section-subtitle">تجربة كاملة لقراءة القرآن الكريم على كل المنصات بكود واحد موحَّد</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-book-quran"></i></div>
+          <h3 class="text-xl font-bold mb-2">4 روايات معتمدة</h3>
+          <p style="color: var(--fg-muted)">ورش (الافتراضية)، حفص، قالون، الدوري — جميعها من api.alquran.cloud مع تخزين محلي.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+          <h3 class="text-xl font-bold mb-2">13+ قارئاً</h3>
+          <p style="color: var(--fg-muted)">العفاسي، الحصري، المنشاوي، عبد الباسط، إبراهيم الدوسري، ياسين الجزائري وغيرهم — صوت لكل آية.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-highlighter"></i></div>
+          <h3 class="text-xl font-bold mb-2">تظليل آية متزامن</h3>
+          <p style="color: var(--fg-muted)">نقرة لتظليل، نقرتان للتشغيل. تتابع تلقائي للآيات والصفحات بفجوة أقل من 200ms.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <h3 class="text-xl font-bold mb-2">بحث عربي ذكي</h3>
+          <p style="color: var(--fg-muted)">"الرحمن" تطابق "ٱلرَّحْمَٰنِ". مراجع آيات (2:255)، أسماء سور، كنى (الكرسي، قلب القرآن).</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+          <h3 class="text-xl font-bold mb-2">5 سمات بصرية</h3>
+          <p style="color: var(--fg-muted)">ذهبي (الافتراضية)، ليلي، نهاري، سيبيا، تلقائي يتبع نظام التشغيل.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-font"></i></div>
+          <h3 class="text-xl font-bold mb-2">6 خطوط قرآنية</h3>
+          <p style="color: var(--fg-muted)">عثماني (مصحف المدينة)، أميري، أميري ملوّن، ArbFONTS، خط النظام، مسطر.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+          <h3 class="text-xl font-bold mb-2">يعمل أيضاً في وضع عدم الاتصال</h3>
+          <p style="color: var(--fg-muted)">PWA مع Workbox و5 استراتيجيات للـ caching. تنزيل النصوص والصوت والصور للعمل دون إنترنت.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-expand"></i></div>
+          <h3 class="text-xl font-bold mb-2">وضع ملء الشاشة</h3>
+          <p style="color: var(--fg-muted)">إخفاء كل الأدوات للقراءة المركَّزة. شريط عائم يختفي تلقائياً بعد 3 ثوان من الخمول.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+          <h3 class="text-xl font-bold mb-2">متجاوب 360px → 4K</h3>
+          <p style="color: var(--fg-muted)">يعمل على الهاتف والجهاز اللوحي والحاسوب. زر العودة في أندرويد + swipe بين الصفحات.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!--                              Downloads                                  -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="downloads" class="py-24 px-4" style="background: linear-gradient(180deg, transparent, var(--accent-soft) 50%, transparent)">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="section-title accent-text">تنزيل التطبيق</h2>
+      <p class="section-subtitle">حزم جاهزة لمعظم منصات GNU/Linux و Android — نفس التجربة على كل المنصات</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- AppImage -->
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.0/GT-QURANREADER-4.0.0-x86_64.AppImage"
+           class="card download-card group" download>
+          <i class="fa-brands fa-linux icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">AppImage</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">محمول — يعمل على كل توزيعات GNU/Linux دون تثبيت</p>
+          <div class="text-sm mb-4 opacity-70">x86_64 · 109 MB</div>
+          <span class="btn-primary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-download ml-1"></i> تنزيل
+          </span>
+        </a>
+
+        <!-- Debian / DEB -->
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.0/GT-QURANREADER-4.0.0-amd64.deb"
+           class="card download-card group" download>
+          <i class="fa-brands fa-debian icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">DEB</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">Debian · Ubuntu · Mint · Pop!_OS · MX GNU/Linux</p>
+          <div class="text-sm mb-4 opacity-70">amd64 · 77 MB</div>
+          <span class="btn-primary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-download ml-1"></i> تنزيل
+          </span>
+        </a>
+
+        <!-- Fedora / RPM -->
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.0/GT-QURANREADER-4.0.0-x86_64.rpm"
+           class="card download-card group" download>
+          <i class="fa-brands fa-fedora icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">RPM</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">Fedora · RHEL · openSUSE · CentOS Stream</p>
+          <div class="text-sm mb-4 opacity-70">x86_64 · 107 MB</div>
+          <span class="btn-primary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-download ml-1"></i> تنزيل
+          </span>
+        </a>
+
+        <!-- Flatpak -->
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.0/GT-QURANREADER-4.0.0.flatpak"
+           class="card download-card group" download>
+          <i class="fa-solid fa-cube icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">Flatpak</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">معزول وآمن — يعمل على كل توزيعات GNU/Linux</p>
+          <div class="text-sm mb-4 opacity-70">x86_64 · 77 MB</div>
+          <span class="btn-primary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-download ml-1"></i> تنزيل
+          </span>
+        </a>
+
+        <!-- Android APK -->
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.0/GT-QURANREADER-4.0.0-release.apk"
+           class="card download-card group" download>
+          <i class="fa-brands fa-android icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">Android APK</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">للهواتف اللوحية والجوّالة — API 22 فأعلى</p>
+          <div class="text-sm mb-4 opacity-70">universal · 7.4 MB</div>
+          <span class="btn-primary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-download ml-1"></i> تنزيل
+          </span>
+        </a>
+
+        <!-- Web v4 (new) -->
+        <a href="./app/"
+           class="card download-card group">
+          <i class="fa-solid fa-globe icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">المتصفح / PWA (v4)</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">النسخة الحالية — يعمل في أي متصفح حديث + قابل للتثبيت كتطبيق</p>
+          <div class="text-sm mb-4 opacity-70">PWA · 1.5 MB shell</div>
+          <span class="btn-primary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i> فتح مباشرة
+          </span>
+        </a>
+
+        <!-- Web v3 (legacy) -->
+        <a href="https://salehgnutux.github.io/GT-QURANREADER-WEB/"
+           class="card download-card group" target="_blank" rel="noopener">
+          <i class="fa-solid fa-clock-rotate-left icon text-6xl mb-6 block"></i>
+          <h3 class="text-2xl font-bold mb-2">النسخة القديمة (v3)</h3>
+          <p class="mb-4" style="color: var(--fg-muted)">Vanilla JS — متاحة على المستودع القديم بدون حذف</p>
+          <div class="text-sm mb-4 opacity-70">archived · إصدار 2025</div>
+          <span class="btn-secondary inline-block px-6 py-2 rounded-lg text-sm">
+            <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i> فتح النسخة القديمة
+          </span>
+        </a>
+
+      </div>
+
+      <div class="mt-12 card rounded-2xl p-6 max-w-3xl mx-auto">
+        <h4 class="font-bold text-lg mb-3 flex items-center gap-2" style="color: var(--accent)">
+          <i class="fa-solid fa-terminal"></i>
+          تعليمات التثبيت السريعة
+        </h4>
+        <div class="space-y-3 text-sm" dir="ltr" style="text-align: left;">
+          <div>
+            <div class="font-bold mb-1" style="color: var(--fg-muted)">AppImage:</div>
+            <code class="block bg-black/30 rounded p-2">chmod +x GT-QURANREADER-4.0.0-x86_64.AppImage && ./GT-QURANREADER-4.0.0-x86_64.AppImage</code>
+          </div>
+          <div>
+            <div class="font-bold mb-1" style="color: var(--fg-muted)">DEB:</div>
+            <code class="block bg-black/30 rounded p-2">sudo dpkg -i GT-QURANREADER-4.0.0-amd64.deb</code>
+          </div>
+          <div>
+            <div class="font-bold mb-1" style="color: var(--fg-muted)">RPM:</div>
+            <code class="block bg-black/30 rounded p-2">sudo dnf install ./GT-QURANREADER-4.0.0-x86_64.rpm</code>
+          </div>
+          <div>
+            <div class="font-bold mb-1" style="color: var(--fg-muted)">Flatpak:</div>
+            <code class="block bg-black/30 rounded p-2">flatpak install --user GT-QURANREADER-4.0.0.flatpak</code>
+          </div>
+          <div>
+            <div class="font-bold mb-1" style="color: var(--fg-muted)">Android APK:</div>
+            <code class="block bg-black/30 rounded p-2">adb install -r GT-QURANREADER-4.0.0-release.apk</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!--                              About                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="about" class="py-24 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="section-title accent-text">حول المشروع</h2>
+
+      <p class="text-lg mb-6" style="color: var(--fg-muted)">
+        GT-QuranReader هو تطبيق حر مفتوح المصدر لقراءة القرآن الكريم،
+        مبني بـ <strong style="color: var(--accent)">React + TypeScript</strong>
+        ويعمل عبر <strong style="color: var(--accent)">Electron</strong> على سطح المكتب،
+        و <strong style="color: var(--accent)">PWA</strong> على المتصفح،
+        و <strong style="color: var(--accent)">Capacitor</strong> على أندرويد و iOS.
+        كل ذلك من قاعدة كود واحدة موحَّدة (<a href="https://github.com/SalehGNUTUX/GT-QURANREADER" target="_blank" rel="noopener" class="underline" style="color: var(--accent)">monorepo</a>).
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
+        <div class="card rounded-xl p-6 text-right">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fa-solid fa-scale-balanced text-2xl" style="color: var(--accent)"></i>
+            <h3 class="text-xl font-bold">ترخيص مزدوج</h3>
+          </div>
+          <p style="color: var(--fg-muted)">
+            <strong>GPL-3.0</strong> لنواة سطح المكتب و <strong>AGPL-3.0</strong> لنسخة الويب — لضمان حرية المستخدمين على الخوادم.
+          </p>
+        </div>
+
+        <div class="card rounded-xl p-6 text-right">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fa-solid fa-hand-holding-heart text-2xl" style="color: var(--accent)"></i>
+            <h3 class="text-xl font-bold">صدقة جارية</h3>
+          </div>
+          <p style="color: var(--fg-muted)">
+            مشروع غير ربحي. الكود متاح للاستخدام والتعديل والمساهمة — اللهم اجعله صدقة جارية.
+          </p>
+        </div>
+
+        <div class="card rounded-xl p-6 text-right">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fa-solid fa-database text-2xl" style="color: var(--accent)"></i>
+            <h3 class="text-xl font-bold">مصادر البيانات</h3>
+          </div>
+          <p style="color: var(--fg-muted)">
+            النص من <code>api.alquran.cloud</code>، الصوت من <code>everyayah.com</code>،
+            صور الصفحات من مستودع <code>Quran-PNG</code>.
+          </p>
+        </div>
+
+        <div class="card rounded-xl p-6 text-right">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fa-solid fa-shield-halved text-2xl" style="color: var(--accent)"></i>
+            <h3 class="text-xl font-bold">خصوصية كاملة</h3>
+          </div>
+          <p style="color: var(--fg-muted)">
+            لا تتبّع، لا إعلانات، لا تحليلات. كل البيانات محلية (localStorage / IndexedDB / userData).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!--                              Footer                                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <footer class="py-12 px-4 border-t" style="border-color: var(--border)">
+    <div class="max-w-6xl mx-auto text-center">
+
+      <p class="quran-text mb-3" style="color: var(--accent); font-size: 1.65rem;">
+        ﴿ وَنَزَّلۡنَا عَلَيۡكَ ٱلۡكِتَٰبَ تِبۡيَٰنٗا لِّكُلِّ شَيۡءٖ ﴾
+      </p>
+      <p class="text-sm mb-8" style="color: var(--fg-muted)">— سورة النحل، الآية 89</p>
+
+      <div class="flex flex-wrap gap-6 justify-center mb-8">
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER" target="_blank" rel="noopener" class="hover:opacity-70 transition flex items-center gap-2">
+          <i class="fa-brands fa-github text-xl"></i>
+          <span>المستودع</span>
+        </a>
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/issues" target="_blank" rel="noopener" class="hover:opacity-70 transition flex items-center gap-2">
+          <i class="fa-solid fa-bug text-xl"></i>
+          <span>الإبلاغ عن مشكلة</span>
+        </a>
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases" target="_blank" rel="noopener" class="hover:opacity-70 transition flex items-center gap-2">
+          <i class="fa-solid fa-tag text-xl"></i>
+          <span>الإصدارات</span>
+        </a>
+        <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" class="hover:opacity-70 transition flex items-center gap-2">
+          <i class="fa-solid fa-handshake text-xl"></i>
+          <span>المساهمة</span>
+        </a>
+      </div>
+
+      <div class="text-sm" style="color: var(--fg-muted)">
+        <p class="mb-2">
+          🤲 اللهم اجعل هذا العمل صدقة جارية لكل من شارك فيه واستفاد منه
+        </p>
+        <p>
+          تم التطوير بواسطة
+          <a href="https://github.com/SalehGNUTUX" target="_blank" rel="noopener" class="underline font-bold" style="color: var(--accent)">SalehGNUTUX</a>
+          · GT-QuranReader v4.0.0
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    const THEMES = ['gold', 'dark', 'light', 'sepia', 'auto'];
+    const SAVED_KEY = 'gtqr_site_theme';
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function applyTheme(theme) {
+      THEMES.forEach(t => root.classList.remove(t));
+      if (theme === 'auto') {
+        root.classList.add(mq.matches ? 'dark' : 'light');
+      } else {
+        root.classList.add(theme);
+      }
+      try { localStorage.setItem(SAVED_KEY, theme); } catch (_) {}
+      document.querySelectorAll('.theme-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.theme === theme);
+      });
+    }
+
+    const initial = (() => {
+      try { return localStorage.getItem(SAVED_KEY) || 'gold'; }
+      catch (_) { return 'gold'; }
+    })();
+    applyTheme(initial);
+
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    });
+
+    mq.addEventListener('change', () => {
+      try {
+        if (localStorage.getItem(SAVED_KEY) === 'auto') applyTheme('auto');
+      } catch (_) {}
+    });
+
+    // ─── تبديل آية البانر كل 10 ثوان مع crossfade ────────────────────────────
+    const VERSES = [
+      {
+        text: '﴿ إِن تُقۡرِضُواْ ٱللَّهَ قَرۡضًا حَسَنٗا يُضَٰعِفۡهُ لَكُمۡ وَيَغۡفِرۡ لَكُمۡۚ وَٱللَّهُ شَكُورٌ حَلِيمٌ ﴾',
+        ref: '— سورة التغابن، الآية 17'
+      },
+      {
+        text: '﴿ وَلَقَدۡ يَسَّرۡنَا ٱلۡقُرۡءَانَ لِلذِّكۡرِ فَهَلۡ مِن مُّدَّكِرٖ ﴾',
+        ref: '— سورة القمر، الآية 17'
+      }
+    ];
+    let verseIdx = 0;
+    const banner = document.getElementById('verseBanner');
+    const verseTextEl = document.getElementById('verseText');
+    const verseRefEl = document.getElementById('verseRef');
+
+    setInterval(() => {
+      banner.classList.add('fading');
+      setTimeout(() => {
+        verseIdx = (verseIdx + 1) % VERSES.length;
+        verseTextEl.textContent = VERSES[verseIdx].text;
+        verseRefEl.textContent = VERSES[verseIdx].ref;
+        banner.classList.remove('fading');
+      }, 600);
+    }, 10000);
+  </script>
+</body>
+</html>
