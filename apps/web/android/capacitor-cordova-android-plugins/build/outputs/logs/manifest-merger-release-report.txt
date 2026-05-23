@@ -1,0 +1,20 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:2:1-8:12
+INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:2:1-8:12
+	package
+		INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml
+	xmlns:amazon
+		ADDED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:3:1-57
+	xmlns:android
+		ADDED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:4:1-6:15
+uses-sdk
+INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml
+INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /mnt/81d4e25b-45b1-43fd-917c-57799e706dc7/برامج و أنظمة/MY SCREPT/GT-QURANREADER/apps/web/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml
