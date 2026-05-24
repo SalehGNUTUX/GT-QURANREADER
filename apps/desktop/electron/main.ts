@@ -1,13 +1,11 @@
 import { app, BrowserWindow, ipcMain, shell, nativeImage } from 'electron';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { registerDataIpc } from './ipc/data.js';
-import { registerDownloadIpc } from './ipc/download.js';
-import { registerStorageIpc } from './ipc/storage.js';
+import { registerDataIpc } from './ipc/data';
+import { registerDownloadIpc } from './ipc/download';
+import { registerStorageIpc } from './ipc/storage';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// CJS: __dirname و __filename متاحان كـ globals — لا حاجة لـ fileURLToPath/import.meta.
 
 const isDev = process.env.NODE_ENV === 'development';
 const VITE_DEV_URL = 'http://localhost:5173';
