@@ -17,9 +17,15 @@ import {
   RiwayaModal,
   SettingsModal,
   ConfirmDialog,
+  ToolsMenuModal,
+  FontPickerModal,
+  GestureDebugOverlay,
+  AVAILABLE_FONTS,
+  type BookmarkAction,
   usePreferences,
   useSearch,
   useSwipe,
+  usePinchZoom,
   useFullscreen,
 } from '@gt-quranreader/ui';
 import {
@@ -39,7 +45,7 @@ import { isCapacitor } from './platform/runtime';
 import { initCapacitor } from './platform/capacitor-init';
 
 type VerseRef = { surah: number; ayah: number };
-type OpenModal = null | 'surah' | 'juz' | 'sajda' | 'reciter' | 'riwaya' | 'settings';
+type OpenModal = null | 'surah' | 'juz' | 'sajda' | 'reciter' | 'riwaya' | 'settings' | 'font';
 
 export function App() {
   const { prefs, update, updateMany, reset, loaded } = usePreferences();
@@ -48,6 +54,7 @@ export function App() {
     reciterId: prefs.reciterId,
     autoNextVerse: true,
     autoNextSurah: prefs.autoPlayNext,
+    volume: prefs.volume,
   });
   const search = useSearch(quran.data);
   const fullscreen = useFullscreen();
@@ -60,6 +67,7 @@ export function App() {
   const [resumeAsk, setResumeAsk] = useState<VerseRef | null>(null);
   const [openModal, setOpenModal] = useState<OpenModal>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
 
   // استعادة آخر آية مظللة من التفضيلات عند أول تحميل.
   useEffect(() => {
@@ -138,17 +146,51 @@ export function App() {
     }
   }, [prefs.theme]);
 
-  const onPageChange = useCallback((p: number) => update('currentPage', p), [update]);
+  // عند تغيير الصفحة، نصعد لأعلى محتوى القرآن (وليس أعلى التطبيق) —
+  // إلا إن كان صوت يعمل (scrollIntoView على الآية يتولى الأمر).
+  useEffect(() => {
+    if (!player.activeVerse) {
+      const main = document.querySelector('.app-main');
+      if (main) {
+        main.scrollIntoView({ block: 'start', behavior: 'auto' });
+      }
+    }
+  }, [prefs.currentPage, player.activeVerse]);
+
+  // تغيير صفحة يدوي → يحدّث currentPage + lastReadPage معاً.
+  // الأخير يتذكر آخر صفحة قراءة حتى بعد جلسات الاستماع.
+  const onPageChange = useCallback(
+    (p: number) => updateMany({ currentPage: p, lastReadPage: p }),
+    [updateMany]
+  );
 
   const goPrev = useCallback(
-    () => update('currentPage', Math.max(1, prefs.currentPage - 1)),
-    [prefs.currentPage, update]
+    () => onPageChange(Math.max(1, prefs.currentPage - 1)),
+    [prefs.currentPage, onPageChange]
   );
   const goNext = useCallback(
-    () => update('currentPage', Math.min(TOTAL_PAGES, prefs.currentPage + 1)),
-    [prefs.currentPage, update]
+    () => onPageChange(Math.min(TOTAL_PAGES, prefs.currentPage + 1)),
+    [prefs.currentPage, onPageChange]
   );
+
+  // استعادة آخر صفحة قراءة عند الإقلاع — حتى إن كان الصوت تركها في صفحة أخرى.
+  const didRestoreReadingPage = useRef(false);
+  useEffect(() => {
+    if (loaded && !didRestoreReadingPage.current) {
+      didRestoreReadingPage.current = true;
+      if (prefs.lastReadPage && prefs.lastReadPage !== prefs.currentPage) {
+        update('currentPage', prefs.lastReadPage);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
   const swipeRef = useSwipe<HTMLDivElement>({ onSwipeLeft: goPrev, onSwipeRight: goNext });
+  // pinch لتكبير/تصغير الخط على الهاتف — مفعَّل فقط في وضع النص.
+  const pinchRef = usePinchZoom<HTMLElement>({
+    onZoom: (s) => update('fontSize', s),
+    currentSize: prefs.fontSize,
+    enabled: prefs.viewMode !== 'image',
+  });
 
   // زر التشغيل العائم:
   // - يعمل → إيقاف مؤقت
@@ -201,9 +243,9 @@ export function App() {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
-      if (e.key === 'ArrowRight') update('currentPage', Math.max(1, prefs.currentPage - 1));
+      if (e.key === 'ArrowRight') onPageChange(Math.max(1, prefs.currentPage - 1));
       else if (e.key === 'ArrowLeft') {
-        update('currentPage', Math.min(TOTAL_PAGES, prefs.currentPage + 1));
+        onPageChange(Math.min(TOTAL_PAGES, prefs.currentPage + 1));
       } else if (e.key === ' ') {
         e.preventDefault();
         handlePlayPause();
@@ -216,7 +258,7 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [prefs.currentPage, player, update, search, handlePlayPause]);
+  }, [prefs.currentPage, player, onPageChange, search, handlePlayPause]);
 
   // النقرة المفردة: toggle — إذا الآية نفسها مظللة، أزل التظليل، وإلا ظلّلها.
   const handleVerseSingleClick = useCallback(
@@ -274,17 +316,83 @@ export function App() {
 
   const handleSearchSelect = useCallback(
     (r: SearchResult) => {
-      update('currentPage', r.page);
+      onPageChange(r.page);
       if (r.type === 'verse' && r.surahNumber && r.verseNumber) {
         setHighlightedVerse({ surah: r.surahNumber, ayah: r.verseNumber });
       }
       search.close();
     },
-    [update, search]
+    [onPageChange, search]
   );
 
+  // ─── علامة موضع القراءة اليدوية (مستقلة عن lastStoppedAt للصوت) ────────
+  const handleSaveReadingBookmark = useCallback(() => {
+    let target: VerseRef | null = highlightedVerse;
+    if (!target) {
+      const surahInfo = getSurahByPage(prefs.currentPage);
+      const surah = quran.data?.surahs.find((s) => s.number === surahInfo.number);
+      const firstVerseOnPage = surah?.verses.find((v) => v.page === prefs.currentPage);
+      if (firstVerseOnPage) {
+        target = { surah: surahInfo.number, ayah: firstVerseOnPage.number };
+      }
+    }
+    if (target) {
+      update('lastReadAt', target);
+    }
+  }, [highlightedVerse, prefs.currentPage, quran.data, update]);
+
+  const handleGoToReadingBookmark = useCallback(() => {
+    if (!prefs.lastReadAt) return;
+    const target = prefs.lastReadAt;
+    const surah = quran.data?.surahs.find((s) => s.number === target.surah);
+    const verse = surah?.verses.find((v) => v.number === target.ayah);
+    if (!verse) return;
+
+    onPageChange(verse.page);
+    setHighlightedVerse(target);
+    setHighlightFromStop(false);
+
+    // scroll للآية المحفوظة بالضبط بعد render الصفحة الجديدة.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.querySelector<HTMLElement>(
+          `[data-surah="${target.surah}"][data-ayah="${target.ayah}"]`
+        );
+        if (el) el.scrollIntoView({ block: 'center', behavior: 'auto' });
+      });
+    });
+  }, [prefs.lastReadAt, quran.data, onPageChange]);
+
+  const handleRemoveReadingBookmark = useCallback(() => {
+    update('lastReadAt', null);
+  }, [update]);
+
+  // حدّد الحالة الذكية لزر العلامة inline:
+  // - الآية المظللة = الآية المحفوظة → remove
+  // - آية مظللة جديدة (ليست المحفوظة) → save (يستبدل العلامة بالجديدة)
+  // - لا آية مظللة + توجد علامة → goto
+  // - لا شيء → save
+  const bookmarkAction: BookmarkAction =
+    prefs.lastReadAt &&
+    highlightedVerse?.surah === prefs.lastReadAt.surah &&
+    highlightedVerse?.ayah === prefs.lastReadAt.ayah
+      ? 'remove'
+      : highlightedVerse
+        ? 'save'
+        : prefs.lastReadAt
+          ? 'goto'
+          : 'save';
+
+  const handleBookmarkAction = useCallback(() => {
+    if (bookmarkAction === 'save') handleSaveReadingBookmark();
+    else if (bookmarkAction === 'goto') handleGoToReadingBookmark();
+    else if (bookmarkAction === 'remove') handleRemoveReadingBookmark();
+  }, [bookmarkAction, handleSaveReadingBookmark, handleGoToReadingBookmark, handleRemoveReadingBookmark]);
+
+  // السمات التي تحتاج قلب صورة المصحف (خلفية داكنة → نحوّل الحبر الأسود لأبيض).
   const isDark =
     prefs.theme === 'dark' ||
+    prefs.theme === 'gold' ||
     (prefs.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   if (!loaded) {
@@ -395,7 +503,7 @@ export function App() {
         <div className="error-banner" role="alert">⚠️ {player.error.message}</div>
       )}
 
-      <main className="app-main">
+      <main className="app-main" ref={pinchRef}>
         {prefs.viewMode === 'image' && <ImagePage page={prefs.currentPage} darkMode={isDark} />}
         {showTextMode && (
           <TextPage
@@ -407,6 +515,7 @@ export function App() {
             fontFamily={prefs.fontId}
             highlightedVerse={highlightedVerse}
             activeVerse={prefs.enableVerseHighlight ? player.activeVerse : null}
+            readingBookmark={prefs.lastReadAt}
             onVerseSingleClick={handleVerseSingleClick}
             onVerseDoubleClick={handleVerseDoubleClick}
           />
@@ -420,11 +529,13 @@ export function App() {
         onNext={goNext}
         onPlay={handlePlayPause}
         onStop={handleFullStop}
-        onSearch={() => document.querySelector<HTMLInputElement>('.search-input')?.focus()}
-        onMenu={() => setOpenModal('surah')}
         onToggleFullscreen={fullscreen.toggle}
         onZoomIn={() => update('fontSize', Math.min(200, prefs.fontSize + 10))}
         onZoomOut={() => update('fontSize', Math.max(80, prefs.fontSize - 10))}
+        onOpenToolsMenu={() => setToolsMenuOpen(true)}
+        bookmarkAction={bookmarkAction}
+        onBookmarkAction={handleBookmarkAction}
+        isIdle={fullscreen.idle}
         isPlaying={player.isPlaying}
         hasActiveSession={Boolean(player.activeVerse)}
         isFullscreen={fullscreen.active}
@@ -494,6 +605,39 @@ export function App() {
           onCancel={handleResumeCancel}
         />
       )}
+
+      {toolsMenuOpen && (
+        <ToolsMenuModal
+          onClose={() => setToolsMenuOpen(false)}
+          onSearch={() => document.querySelector<HTMLInputElement>('.search-input')?.focus()}
+          onOpenSurahList={() => setOpenModal('surah')}
+          onOpenRiwaya={() => setOpenModal('riwaya')}
+          onOpenReciter={() => setOpenModal('reciter')}
+          onOpenFontPicker={() => setOpenModal('font')}
+          currentRiwayaName={riwaya?.name.ar ?? ''}
+          currentReciterName={reciter?.name.ar ?? ''}
+          currentFontName={AVAILABLE_FONTS.find((f) => f.id === prefs.fontId)?.name ?? prefs.fontId}
+          onSaveReadingBookmark={handleSaveReadingBookmark}
+          onGoToReadingBookmark={handleGoToReadingBookmark}
+          onRemoveReadingBookmark={handleRemoveReadingBookmark}
+          hasReadingBookmark={Boolean(prefs.lastReadAt)}
+          onZoomIn={() => update('fontSize', Math.min(200, prefs.fontSize + 10))}
+          onZoomOut={() => update('fontSize', Math.max(80, prefs.fontSize - 10))}
+          canZoom={prefs.viewMode !== 'image'}
+          volume={prefs.volume}
+          onVolumeChange={(v) => update('volume', v)}
+        />
+      )}
+
+      {openModal === 'font' && (
+        <FontPickerModal
+          selectedId={prefs.fontId}
+          onClose={() => setOpenModal(null)}
+          onSelect={(id) => update('fontId', id)}
+        />
+      )}
+
+      <GestureDebugOverlay />
     </div>
   );
 }

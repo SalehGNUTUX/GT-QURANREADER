@@ -5,6 +5,7 @@ interface Options {
   reciterId: string;
   autoNextVerse: boolean;
   autoNextSurah: boolean;
+  volume?: number;
 }
 
 // نسخة الويب لا تحتاج resolve محلي — Workbox cache يعمل تلقائياً.
@@ -38,6 +39,11 @@ export function useVersePlayer(opts: Options) {
   useEffect(() => {
     playerRef.current?.setAutoNext(opts.autoNextVerse, opts.autoNextSurah);
   }, [opts.autoNextVerse, opts.autoNextSurah]);
+
+  // مزامنة مستوى الصوت مع prefs.
+  useEffect(() => {
+    if (opts.volume != null) playerRef.current?.setVolume(opts.volume);
+  }, [opts.volume]);
 
   // الإيقاف التام: ينهي الصوت ويُعيد التطبيق إلى وضع "لا قراءة جارية".
   const stop = () => {

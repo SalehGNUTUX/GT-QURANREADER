@@ -9,6 +9,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // SW يبقى مُعطَّلاً في dev. تفعيله كان يسبّب خدمة cache قديم بعد كل تحديث
+      // → تتعطّل الإيماءات/المزايا الجديدة. اختبار جدول التخزين يتم في build الإنتاج.
       includeAssets: ['icons/*.png', 'fonts/*'],
       manifest: {
         name: 'GT Quran Reader',
