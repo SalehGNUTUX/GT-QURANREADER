@@ -23,13 +23,35 @@
 
 <div align="center">
 
-| سطح المكتب — وضع النص | الهاتف |
-|:---:|:---:|
-| ![Desktop Text](docs/screenshots/desktop-text.png) | ![Mobile](docs/screenshots/mobile.png) |
+### السمات الخمس على سطح المكتب
 
-| أثناء التشغيل (شريط عائم + إيقاف تام) | حوار متابعة القراءة |
-|:---:|:---:|
-| ![Playing](docs/screenshots/mobile-playing.png) | ![Resume Dialog](docs/screenshots/resume-dialog.png) |
+| 🏺 ذهبي (الافتراضية) | 🌙 ليلي | ☀️ نهاري |
+|:---:|:---:|:---:|
+| ![Gold](docs/screenshots/desktop-gold.png) | ![Dark](docs/screenshots/desktop-dark.png) | ![Light](docs/screenshots/desktop-light.png) |
+
+| 📜 سيبيا | 📖 وضع صورة المصحف | 🎧 أثناء التلاوة |
+|:---:|:---:|:---:|
+| ![Sepia](docs/screenshots/desktop-sepia.png) | ![Image Mode](docs/screenshots/desktop-image-mode.png) | ![Playing](docs/screenshots/desktop-playing.png) |
+
+### الـ Modals والإعدادات
+
+| ☰ قائمة السور | 🎤 اختيار القارئ | 🔍 البحث |
+|:---:|:---:|:---:|
+| ![Surah Modal](docs/screenshots/desktop-surah-modal.png) | ![Reciter Modal](docs/screenshots/desktop-reciter-modal.png) | ![Search](docs/screenshots/desktop-search.png) |
+
+| ⚙️ الإعدادات | 🎧 متابعة القراءة | 📖 وضع النص |
+|:---:|:---:|:---:|
+| ![Settings](docs/screenshots/desktop-settings.png) | ![Resume](docs/screenshots/resume-dialog.png) | ![Text](docs/screenshots/desktop-text.png) |
+
+### الهاتف واللوحي
+
+| 📱 هاتف ذهبي | 📱 هاتف ليلي | 📱 هاتف سيبيا |
+|:---:|:---:|:---:|
+| ![Mobile Gold](docs/screenshots/mobile-gold.png) | ![Mobile Dark](docs/screenshots/mobile-dark.png) | ![Mobile Sepia](docs/screenshots/mobile-sepia.png) |
+
+| 📱 هاتف أثناء التلاوة | 📱 هاتف السور | 📲 لوحي ذهبي/ليلي |
+|:---:|:---:|:---:|
+| ![Mobile Playing](docs/screenshots/mobile-playing.png) | ![Mobile Surah](docs/screenshots/mobile-surah-modal.png) | ![Tablet](docs/screenshots/tablet-gold.png) |
 
 </div>
 

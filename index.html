@@ -277,6 +277,155 @@
     /* روابط داخلية تمرّر بسلاسة بعيداً عن الهيدر */
     section { scroll-margin-top: 80px; }
 
+    /* ───────── زر العودة لرأس الصفحة ───────── */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      inset-inline-start: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 18px var(--accent-soft, rgba(212, 175, 55, 0.3));
+      z-index: 70;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .back-to-top:hover {
+      background: var(--accent-hover, var(--accent));
+      transform: translateY(-3px);
+    }
+
+    html.light .back-to-top, html.sepia .back-to-top { color: #fff; }
+
+    @media (max-width: 640px) {
+      .back-to-top { width: 42px; height: 42px; bottom: 16px; inset-inline-start: 16px; font-size: 1.3rem; }
+    }
+
+    /* ───────── Carousel لقطات الشاشة ───────── */
+    .carousel {
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      margin-inline: auto;
+      overflow: hidden;
+      border-radius: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      margin: 0;
+      padding: 1.5rem 1.5rem 1rem;
+      text-align: center;
+    }
+
+    .carousel-slide img {
+      max-width: 100%;
+      max-height: 60vh;
+      border-radius: 0.75rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      margin-inline: auto;
+      display: block;
+    }
+
+    .carousel-slide figcaption {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-elev);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 1.7rem;
+      line-height: 1;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    .carousel-btn:hover, .carousel-btn:active {
+      background: var(--accent);
+      color: var(--bg);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .carousel-btn-prev { inset-inline-end: 12px; }
+    .carousel-btn-next { inset-inline-start: 12px; }
+
+    .carousel-dots {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: center;
+      padding: 0.5rem 1rem 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .carousel-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .carousel-dot:hover { background: var(--fg-muted); }
+
+    .carousel-dot.active {
+      background: var(--accent);
+      width: 22px;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .carousel-btn { width: 38px; height: 38px; font-size: 1.4rem; }
+      .carousel-slide { padding: 1rem 0.75rem 0.75rem; }
+      .carousel-slide img { max-height: 70vh; }
+      .carousel-slide figcaption { font-size: 0.9rem; }
+    }
+
     /* خط قرآني للآيات */
     .quran-text {
       font-family: 'Amiri Quran', 'Amiri', 'Tajawal', serif;
@@ -331,6 +480,10 @@
     <p class="verse-ref" id="verseRef">— سورة التغابن، الآية 17</p>
   </div>
 
+  <button type="button" id="backToTop" class="back-to-top" aria-label="العودة إلى رأس الصفحة" title="العودة إلى الأعلى">
+    ↑
+  </button>
+
   <div class="theme-switcher" role="toolbar" aria-label="تبديل السمة">
     <button data-theme="gold" class="theme-btn" title="ذهبي" aria-label="السمة الذهبية">🏺</button>
     <button data-theme="dark" class="theme-btn" title="ليلي" aria-label="السمة الليلية">🌙</button>
@@ -359,7 +512,7 @@
     </p>
 
     <div class="flex flex-wrap gap-4 justify-center mb-6">
-      <a href="./app/" class="btn-primary px-8 py-4 rounded-xl text-lg">
+      <a href="./app/" target="_blank" rel="noopener" class="btn-primary px-8 py-4 rounded-xl text-lg">
         <i class="fa-solid fa-globe ml-2"></i>
         جرّب نسخة الويب (v4)
       </a>
@@ -465,9 +618,115 @@
         <div class="card rounded-2xl p-6">
           <div class="feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
           <h3 class="text-xl font-bold mb-2">متجاوب 360px → 4K</h3>
-          <p style="color: var(--fg-muted)">يعمل على الهاتف والجهاز اللوحي والحاسوب. زر العودة في أندرويد + swipe بين الصفحات.</p>
+          <p style="color: var(--fg-muted)">يعمل على الهاتف والجهاز اللوحي والحاسوب. واجهة موحّدة بتجربة متناسقة على كل المنصات.</p>
         </div>
 
+        <!-- ═══════════ مزايا v4.0.1 الجديدة ═══════════ -->
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-bookmark"></i></div>
+          <h3 class="text-xl font-bold mb-2">علامة موضع القراءة</h3>
+          <p style="color: var(--fg-muted)">🔖 احفظ آية مرئية، 📖 ارجع إليها لاحقاً، 🗑️ احذف العلامة — زر ذكي يتبدّل بثلاث حالات حسب السياق. مستقلة تماماً عن موضع الاستماع.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-headphones-simple"></i></div>
+          <h3 class="text-xl font-bold mb-2">استئناف الاستماع</h3>
+          <p style="color: var(--fg-muted)">آخر آية كنت تستمع إليها تُحفظ تلقائياً. عند العودة، حوار "متابعة من حيث توقفت / بدء السورة من أوّلها" يظهر بنفس نمط البرنامج.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-arrows-up-to-line"></i></div>
+          <h3 class="text-xl font-bold mb-2">آخر صفحة قراءة منفصلة</h3>
+          <p style="color: var(--fg-muted)">حتى لو أخذك الصوت لصفحة 30، عند إعادة فتح التطبيق تعود تلقائياً إلى آخر صفحة كنت تقرأ فيها يدوياً — لا تفقد موضعك أبداً.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-hand-pointer"></i></div>
+          <h3 class="text-xl font-bold mb-2">سحب لتقليب الصفحات</h3>
+          <p style="color: var(--fg-muted)">على الهاتف اللوحي والجوّال: اسحب يميناً للصفحة السابقة، يساراً للتالية. زر احتياطي 📄 في الشريط العائم لو فضّلت الأزرار.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-hand"></i></div>
+          <h3 class="text-xl font-bold mb-2">قَرص الإصبعين لحجم الخط</h3>
+          <p style="color: var(--fg-muted)">على شاشة اللمس: باعد إصبعيك لتكبير الخط، قرّبهما للتصغير. خطوات 5% بين 80% و200%. زر بديل خخ في الشريط العائم.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-volume-high"></i></div>
+          <h3 class="text-xl font-bold mb-2">تحكم بمستوى الصوت</h3>
+          <p style="color: var(--fg-muted)">شريط مرن دقيق (0-100% بخطوات 5%) في قائمة "المزيد" ⋯ — مع أزرار 🔉/🔊 ونسبة مرئية. يُحفظ بين الجلسات.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-ellipsis"></i></div>
+          <h3 class="text-xl font-bold mb-2">قائمة "المزيد" الذكية</h3>
+          <p style="color: var(--fg-muted)">من زر ⋯ صل بسرعة إلى: السور · البحث · الرواية · القارئ · الخط (بمعاينة حية) · علامة القراءة · حجم الخط · مستوى الصوت — كلها مكان واحد.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-expand"></i></div>
+          <h3 class="text-xl font-bold mb-2">وضع ملء الشاشة المركَّز</h3>
+          <p style="color: var(--fg-muted)">يخفي كل الأدوات لقراءة بلا تشتيت. الشريط العائم نفسه يتلاشى بعد 3 ثوان من الخمول ويظهر بأي حركة.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-database"></i></div>
+          <h3 class="text-xl font-bold mb-2">إدارة تخزين كاملة</h3>
+          <p style="color: var(--fg-muted)">جدول يعرض كل ما تم تنزيله محلياً (نصوص + صوت + صور) بحجم تقريبي + زر حذف لكل قسم + زر مسح شامل. حوارات تأكيد متّسقة مع السمة.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3 class="text-xl font-bold mb-2">خصوصية كاملة</h3>
+          <p style="color: var(--fg-muted)">لا تتبّع، لا إعلانات، لا تحليلات، لا حسابات. كل البيانات محلية على جهازك (localStorage + IndexedDB + Cache API). مفتوح المصدر بالكامل.</p>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <div class="feature-icon"><i class="fa-solid fa-code-branch"></i></div>
+          <h3 class="text-xl font-bold mb-2">مفتوح المصدر — GPL/AGPL</h3>
+          <p style="color: var(--fg-muted)">ترخيص مزدوج: GPL-3.0 لسطح المكتب، AGPL-3.0 للويب. المصدر الكامل متاح للتعديل والمساهمة. صدقة جارية لكل مَن شارك.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!--                              Screenshots Carousel                       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="screenshots" class="py-24 px-4">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="section-title accent-text">لقطات</h2>
+      <p class="section-subtitle">جوّل بين المزايا والسمات الخمس + الـ modals + الهاتف واللوحي</p>
+
+      <div class="carousel" aria-roledescription="carousel">
+        <button class="carousel-btn carousel-btn-prev" aria-label="السابقة" type="button">‹</button>
+        <button class="carousel-btn carousel-btn-next" aria-label="التالية" type="button">›</button>
+
+        <div class="carousel-track" id="carouselTrack">
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-gold.png" alt="السمة الذهبية" loading="lazy" /><figcaption>🏺 السمة الذهبية (افتراضية) — سطح المكتب</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-dark.png" alt="السمة الليلية" loading="lazy" /><figcaption>🌙 السمة الليلية — سطح المكتب</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-light.png" alt="السمة النهارية" loading="lazy" /><figcaption>☀️ السمة النهارية — سطح المكتب</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-sepia.png" alt="السمة السيبيا" loading="lazy" /><figcaption>📜 السمة السيبيا — مريحة للعين</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-image-mode.png" alt="وضع صورة المصحف" loading="lazy" /><figcaption>📖 وضع صورة المصحف — مصحف المدينة</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-playing.png" alt="أثناء التلاوة" loading="lazy" /><figcaption>🎧 أثناء التلاوة — تظليل آية متزامن</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-surah-modal.png" alt="قائمة السور" loading="lazy" /><figcaption>☰ قائمة السور — 114 سورة</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-reciter-modal.png" alt="اختيار القارئ" loading="lazy" /><figcaption>🎤 اختيار القارئ — 13+ قارئاً</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-search.png" alt="البحث الذكي" loading="lazy" /><figcaption>🔍 البحث الذكي — تطبيع عربي كامل</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/desktop-settings.png" alt="الإعدادات" loading="lazy" /><figcaption>⚙️ الإعدادات — تنزيلات + سمات + خطوط + حول</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/resume-dialog.png" alt="حوار متابعة القراءة" loading="lazy" /><figcaption>🎧 حوار متابعة القراءة — استئناف الاستماع</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/mobile-gold.png" alt="هاتف ذهبي" loading="lazy" /><figcaption>📱 الهاتف — السمة الذهبية</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/mobile-dark.png" alt="هاتف ليلي" loading="lazy" /><figcaption>📱 الهاتف — السمة الليلية</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/mobile-sepia.png" alt="هاتف سيبيا" loading="lazy" /><figcaption>📱 الهاتف — السمة السيبيا</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/mobile-playing.png" alt="هاتف أثناء التلاوة" loading="lazy" /><figcaption>📱 الهاتف — أثناء التلاوة</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/mobile-surah-modal.png" alt="هاتف قائمة السور" loading="lazy" /><figcaption>📱 الهاتف — قائمة السور</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/tablet-gold.png" alt="لوحي ذهبي" loading="lazy" /><figcaption>📲 اللوحي — السمة الذهبية</figcaption></figure>
+          <figure class="carousel-slide"><img src="docs/screenshots/tablet-dark.png" alt="لوحي ليلي" loading="lazy" /><figcaption>📲 اللوحي — السمة الليلية</figcaption></figure>
+        </div>
+
+        <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="مؤشّر اللقطات"></div>
       </div>
     </div>
   </section>
@@ -484,7 +743,7 @@
 
         <!-- AppImage -->
         <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.1/GT-QURANREADER-4.0.1-x86_64.AppImage"
-           class="card download-card group" download>
+           class="card download-card group" target="_blank" rel="noopener" download>
           <i class="fa-brands fa-linux icon text-6xl mb-6 block"></i>
           <h3 class="text-2xl font-bold mb-2">AppImage</h3>
           <p class="mb-4" style="color: var(--fg-muted)">محمول — يعمل على كل توزيعات GNU/Linux دون تثبيت</p>
@@ -496,7 +755,7 @@
 
         <!-- Debian / DEB -->
         <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.1/GT-QURANREADER-4.0.1-amd64.deb"
-           class="card download-card group" download>
+           class="card download-card group" target="_blank" rel="noopener" download>
           <i class="fa-brands fa-debian icon text-6xl mb-6 block"></i>
           <h3 class="text-2xl font-bold mb-2">DEB</h3>
           <p class="mb-4" style="color: var(--fg-muted)">Debian · Ubuntu · Mint · Pop!_OS · MX GNU/Linux</p>
@@ -508,7 +767,7 @@
 
         <!-- Fedora / RPM -->
         <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.1/GT-QURANREADER-4.0.1-x86_64.rpm"
-           class="card download-card group" download>
+           class="card download-card group" target="_blank" rel="noopener" download>
           <i class="fa-brands fa-fedora icon text-6xl mb-6 block"></i>
           <h3 class="text-2xl font-bold mb-2">RPM</h3>
           <p class="mb-4" style="color: var(--fg-muted)">Fedora · RHEL · openSUSE · CentOS Stream</p>
@@ -520,7 +779,7 @@
 
         <!-- Flatpak -->
         <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.1/GT-QURANREADER-4.0.1.flatpak"
-           class="card download-card group" download>
+           class="card download-card group" target="_blank" rel="noopener" download>
           <i class="fa-solid fa-cube icon text-6xl mb-6 block"></i>
           <h3 class="text-2xl font-bold mb-2">Flatpak</h3>
           <p class="mb-4" style="color: var(--fg-muted)">معزول وآمن — يعمل على كل توزيعات GNU/Linux</p>
@@ -532,7 +791,7 @@
 
         <!-- Android APK -->
         <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.1/GT-QURANREADER-4.0.1-release.apk"
-           class="card download-card group" download>
+           class="card download-card group" target="_blank" rel="noopener" download>
           <i class="fa-brands fa-android icon text-6xl mb-6 block"></i>
           <h3 class="text-2xl font-bold mb-2">Android APK</h3>
           <p class="mb-4" style="color: var(--fg-muted)">للهواتف اللوحية والجوّالة — API 22 فأعلى</p>
@@ -544,7 +803,7 @@
 
         <!-- Web v4 (new) -->
         <a href="./app/"
-           class="card download-card group">
+           class="card download-card group" target="_blank" rel="noopener">
           <i class="fa-solid fa-globe icon text-6xl mb-6 block"></i>
           <h3 class="text-2xl font-bold mb-2">المتصفح / PWA (v4)</h3>
           <p class="mb-4" style="color: var(--fg-muted)">النسخة الحالية — يعمل في أي متصفح حديث + قابل للتثبيت كتطبيق</p>
@@ -763,6 +1022,83 @@
         banner.classList.remove('fading');
       }, 600);
     }, 10000);
+
+    // ─── Carousel لقطات الشاشة ──────────────────────────────────────
+    (() => {
+      const track = document.getElementById('carouselTrack');
+      const dotsEl = document.getElementById('carouselDots');
+      if (!track || !dotsEl) return;
+      const slides = Array.from(track.children);
+      const total = slides.length;
+      let idx = 0;
+      let timer = null;
+      const INTERVAL_MS = 5000;
+      // الـ slides تمرّ بصرياً من اليمين لليسار في RTL، لكن transform: translateX
+      // يستخدم اتجاه CSS الأساسي. نستخدم النسبة المئوية مع علامة سالبة.
+      const isRtl = document.documentElement.dir === 'rtl';
+
+      // أنشئ النقاط
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `الانتقال للقطة ${i + 1}`);
+        dot.addEventListener('click', () => goTo(i, true));
+        dotsEl.appendChild(dot);
+      });
+
+      const goTo = (i, manual = false) => {
+        idx = (i + total) % total;
+        const offset = idx * 100;
+        track.style.transform = `translateX(${isRtl ? offset : -offset}%)`;
+        dotsEl.querySelectorAll('.carousel-dot').forEach((d, di) => {
+          d.classList.toggle('active', di === idx);
+        });
+        if (manual) restart();
+      };
+
+      const next = () => goTo(idx + 1);
+      const prev = () => goTo(idx - 1);
+
+      const start = () => { timer = window.setInterval(next, INTERVAL_MS); };
+      const stop  = () => { if (timer) { window.clearInterval(timer); timer = null; } };
+      const restart = () => { stop(); start(); };
+
+      document.querySelector('.carousel-btn-next')?.addEventListener('click', () => { next(); restart(); });
+      document.querySelector('.carousel-btn-prev')?.addEventListener('click', () => { prev(); restart(); });
+
+      // أوقف عند hover (مكتب) أو touch (موبايل)
+      const carousel = document.querySelector('.carousel');
+      carousel?.addEventListener('mouseenter', stop);
+      carousel?.addEventListener('mouseleave', start);
+      carousel?.addEventListener('touchstart', stop, { passive: true });
+      // استئناف بعد 5s من آخر touch
+      carousel?.addEventListener('touchend', () => { setTimeout(start, 5000); }, { passive: true });
+
+      // ابدأ التمرير التلقائي عندما يدخل القسم viewport (توفير CPU)
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) start(); else stop();
+        });
+      }, { threshold: 0.25 });
+      io.observe(carousel);
+    })();
+
+    // ─── زر العودة لأعلى الصفحة ───────────────────────────────────
+    (() => {
+      const btn = document.getElementById('backToTop');
+      if (!btn) return;
+      const THRESHOLD = 400; // px
+      const onScroll = () => {
+        btn.classList.toggle('visible', (window.scrollY || window.pageYOffset) > THRESHOLD);
+      };
+      btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
   </script>
 </body>
 </html>
