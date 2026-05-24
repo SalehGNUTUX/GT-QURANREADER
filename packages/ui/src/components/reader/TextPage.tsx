@@ -11,6 +11,8 @@ interface Props {
   fontFamily: string;
   highlightedVerse: { surah: number; ayah: number } | null;
   activeVerse: { surah: number; ayah: number } | null;
+  /** الآية المحفوظة كموضع قراءة يدوي (يُعرَض عليها 🔖 ولها تظليل خفيف). */
+  readingBookmark?: { surah: number; ayah: number } | null;
   onVerseSingleClick: (surah: number, ayah: number) => void;
   onVerseDoubleClick: (surah: number, ayah: number) => void;
 }
@@ -48,6 +50,7 @@ export function TextPage({
   fontFamily,
   highlightedVerse,
   activeVerse,
+  readingBookmark,
   onVerseSingleClick,
   onVerseDoubleClick,
 }: Props) {
@@ -108,6 +111,10 @@ export function TextPage({
                 }
                 isActive={
                   activeVerse?.surah === segment.surahNumber && activeVerse?.ayah === v.number
+                }
+                isReadingBookmark={
+                  readingBookmark?.surah === segment.surahNumber &&
+                  readingBookmark?.ayah === v.number
                 }
                 onSingleClick={() => onVerseSingleClick(segment.surahNumber, v.number)}
                 onDoubleClick={() => onVerseDoubleClick(segment.surahNumber, v.number)}

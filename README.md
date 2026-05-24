@@ -4,7 +4,8 @@
 
 **عارض القرآن الكريم — نسخة موحَّدة لسطح المكتب والويب والموبايل**
 
-![Version](https://img.shields.io/badge/version-4.0.0-brightgreen)
+![Version](https://img.shields.io/badge/version-4.0.1-brightgreen)
+![Live](https://img.shields.io/badge/PWA-salehgnutux.github.io%2FGT--QURANREADER%2Fapp-blue)
 ![License](https://img.shields.io/badge/license-GPL--3.0%20%7C%20AGPL--3.0%20(web)-orange)
 ![Platforms](https://img.shields.io/badge/packages-AppImage%20%7C%20DEB%20%7C%20RPM%20%7C%20Flatpak%20%7C%20APK-success)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)

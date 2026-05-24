@@ -168,6 +168,10 @@ input[type='number'] {
   flex-direction: column;
   max-width: 1280px;
   margin: 0 auto;
+  /* السماح بتمرير عمودي طبيعي + التقاط السحب الأفقي للـ useSwipe (تنقّل الصفحات). */
+  touch-action: pan-y;
+  /* يمنع gesture "back" في Chrome Android (swipe من الحافة) من ابتلاع السحب الأفقي. */
+  overscroll-behavior-x: contain;
   padding: 20px;
   padding-bottom: calc(20px + 80px + env(safe-area-inset-bottom, 0px));
   gap: 16px;
@@ -368,6 +372,10 @@ input[type='number'] {
   height: auto;
   display: block;
   border-radius: 8px;
+  /* امنع المتصفح من معاملة السحب على الصورة كـ drag-to-save أو pan على الصورة الكبيرة. */
+  -webkit-user-drag: none;
+  user-select: none;
+  touch-action: pan-y;
 }
 
 .image-page-error,
@@ -618,6 +626,462 @@ input[type='number'] {
 
 .verse-active .verse-number {
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* تلميح "اسحب يميناً/يساراً" — يظهر عند دخول ملء الشاشة على الموبايل */
+.swipe-hint {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: rgba(28, 20, 16, 0.92);
+  color: var(--fg, #f5e6c8);
+  border: 1px solid var(--accent, #d4af37);
+  border-radius: 16px;
+  padding: 14px 22px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.25);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  pointer-events: auto;
+  animation: swipe-hint-in 0.35s ease-out;
+  max-width: calc(100vw - 32px);
+}
+
+@keyframes swipe-hint-in {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.swipe-hint-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.swipe-hint-arrow {
+  font-size: 1.6rem;
+  color: var(--accent, #d4af37);
+  animation: swipe-arrow 1.5s ease-in-out infinite;
+  line-height: 1;
+}
+
+.swipe-hint-arrow:last-of-type {
+  animation-delay: 0.75s;
+}
+
+@keyframes swipe-arrow {
+  0%, 100% { transform: translateX(0); opacity: 0.6; }
+  50%      { transform: translateX(-6px); opacity: 1; }
+}
+
+.swipe-hint-text {
+  white-space: nowrap;
+}
+
+.swipe-hint-close {
+  background: transparent;
+  border: none;
+  color: var(--fg-muted, #c9b896);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.swipe-hint-close:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--accent);
+}
+
+/* بانر حالة التنزيل في الإعدادات (نجاح/إلغاء/خطأ) */
+.settings-section-job {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.settings-section-job-completed {
+  background: rgba(46, 204, 113, 0.08);
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.settings-section-job-cancelled {
+  background: rgba(149, 165, 166, 0.1);
+  border-color: rgba(149, 165, 166, 0.4);
+}
+
+.settings-section-job-error {
+  background: rgba(192, 57, 43, 0.08);
+  border-color: rgba(192, 57, 43, 0.4);
+}
+
+/* قائمة الأدوات (موبايل): البحث + إجراء العلامة */
+.tools-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 2px;
+}
+
+.tools-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--fg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: start;
+}
+
+.tools-menu-item:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft, rgba(212, 175, 55, 0.12));
+}
+
+.tools-menu-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tools-menu-text {
+  flex: 1;
+}
+
+.tools-menu-meta {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
+  opacity: 0.85;
+  white-space: nowrap;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tools-menu-item-bookmark-remove {
+  border-color: rgba(192, 57, 43, 0.4);
+}
+
+.tools-menu-item-bookmark-remove:hover {
+  background: rgba(192, 57, 43, 0.1);
+  border-color: #c0392b;
+}
+
+.tools-menu-separator {
+  margin: 12px 4px 4px;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.tools-menu-row {
+  display: flex;
+  gap: 8px;
+}
+
+.tools-menu-item-half {
+  flex: 1;
+  justify-content: center;
+}
+
+/* قسم التحكم بمستوى الصوت */
+.tools-menu-volume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.tools-menu-volume-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tools-menu-volume-btn:hover,
+.tools-menu-volume-btn:active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.tools-menu-volume-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.tools-menu-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tools-menu-volume-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--bg);
+}
+
+.tools-menu-volume-pct {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 42px;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* GestureDebugOverlay — مُفعَّل بـ ?debug=gestures */
+.gesture-debug-overlay {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  width: calc(100vw - 16px);
+  max-width: 380px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #0f0;
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 8px;
+  border: 1px solid #0f0;
+  border-radius: 8px;
+  z-index: 99999;
+  pointer-events: auto;
+  backdrop-filter: blur(2px);
+}
+
+.gesture-debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #0f0;
+  padding-bottom: 4px;
+}
+
+.gesture-debug-close {
+  background: transparent;
+  border: 1px solid #0f0;
+  color: #0f0;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.gesture-debug-log {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 240px;
+  overflow: hidden;
+}
+
+.gesture-debug-empty { color: #888; font-style: italic; }
+.gesture-debug-entry-start  { color: #6cf; }
+.gesture-debug-entry-end    { color: #fff; }
+.gesture-debug-entry-detect { color: #0f0; font-weight: bold; }
+.gesture-debug-entry-reject { color: #f80; }
+.gesture-debug-entry-cancel { color: #f44; }
+.gesture-debug-entry-move   { color: #aaa; }
+
+/* قسم حول في الإعدادات */
+.about-section {
+  margin-top: 12px;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 4px;
+}
+
+.about-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+}
+
+.about-tagline {
+  font-size: 1.1rem;
+  color: var(--fg-muted);
+  margin: 0;
+}
+
+.about-version {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  font-family: ui-monospace, monospace;
+  margin: 0;
+}
+
+.about-desc {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--fg);
+  margin: 8px 0;
+}
+
+.about-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.about-meta p { margin: 0; }
+.about-meta strong { color: var(--fg); }
+.about-meta a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-inline-start: 6px;
+}
+.about-meta a:hover { text-decoration: underline; }
+
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.about-link {
+  padding: 8px 14px;
+  background: var(--accent-soft, rgba(212, 175, 55, 0.1));
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.about-link:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.about-dua {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* FontPickerModal */
+.font-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: start;
+}
+
+.font-pick:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft, rgba(212, 175, 55, 0.1));
+}
+
+.font-pick-active {
+  border-color: var(--accent);
+  background: var(--accent-soft, rgba(212, 175, 55, 0.15));
+  box-shadow: 0 0 0 2px var(--accent-soft, rgba(212, 175, 55, 0.2));
+}
+
+.font-pick-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--fg-muted);
+}
+
+.font-pick-preview {
+  color: var(--fg);
+  line-height: 1.8;
+  direction: rtl;
+}
+
+/* زر ⋯ "المزيد" — لمسة لمميز لتمييزه عن باقي الأزرار */
+.floating-btn-more {
+  font-size: 1.4rem;
+  letter-spacing: -2px;
+}
+
+/* علامة موضع القراءة اليدوي 🔖 */
+.verse-reading-bookmark {
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.18) 30%, rgba(212, 175, 55, 0.18) 70%, transparent);
+  border-bottom: 2px dotted var(--accent);
+}
+
+.verse-bookmark-marker {
+  display: inline-block;
+  margin: 0 4px;
+  font-size: 0.9em;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.6));
 }
 
 /* ===== Quick nav ===== */
@@ -1061,22 +1525,94 @@ input[type='number'] {
   overflow: hidden;
 }
 
-.floating-btn-zoom {
-  width: 48px;
-  height: 36px;
-  font-size: 1.4rem;
-  line-height: 1;
-  border-radius: 0;
+/* لوحات منبثقة فوق الشريط العائم (زوم + تنقل الصفحات) */
+.floating-zoom-popover,
+.floating-pagenav-popover {
+  position: fixed;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-elev);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35), 0 0 18px var(--accent-soft, rgba(212, 175, 55, 0.2));
+  z-index: 60;
+  animation: popover-in 0.2s ease-out;
+}
+
+@keyframes popover-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.floating-popover-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: 1px solid var(--border);
-  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.floating-zoom-stack .floating-btn-zoom:first-child {
-  border-radius: 24px 24px 6px 6px;
+.floating-popover-btn:hover,
+.floating-popover-btn:active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  transform: scale(1.05);
 }
 
-.floating-zoom-stack .floating-btn-zoom:last-child {
-  border-radius: 6px 6px 24px 24px;
+.floating-btn-zoom-toggle.floating-btn-active,
+.floating-btn-pagenav-toggle.floating-btn-active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* مرئيّة حسب المنصة */
+.floating-btn-desktop-only { display: inline-flex; }
+.floating-btn-mobile-only  { display: none; }
+
+@media (max-width: 640px) {
+  .floating-btn-desktop-only { display: none; }
+  .floating-btn-mobile-only  { display: inline-flex; }
+}
+
+/* أيقونة "خ كبيرة + خ صغيرة" تعكس وظيفة تكبير/تصغير الخط */
+.zoom-icon {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  line-height: 1;
+  font-family: 'Amiri', 'Tajawal', serif;
+  font-weight: 700;
+}
+
+.zoom-icon-big {
+  font-size: 1.4em;
+  line-height: 1;
+}
+
+.zoom-icon-small {
+  font-size: 0.85em;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+  .floating-zoom-popover,
+  .floating-pagenav-popover {
+    bottom: 78px;
+  }
 }
 
 /* أخفِ شريط التنقل في الأسفل على الديسكتوب الواسع (له PageNav بالأعلى) */
@@ -1201,6 +1737,148 @@ input[type='number'] {
   margin-bottom: 6px;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   تحسينات قسم الإعدادات للهاتف (max-width: 640px) فقط — سطح المكتب لا يتأثر
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  /* Modal — يأخذ معظم الشاشة بدلاً من نافذة صغيرة في الوسط */
+  .modal-backdrop {
+    padding: 8px;
+  }
+  .modal-card {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 14px;
+  }
+  .modal-header {
+    padding: 12px 14px;
+  }
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+  .modal-body {
+    padding: 12px 14px !important;
+  }
+
+  /* الإعدادات: مسافات أقل بين الأقسام، عناوين أصغر */
+  .settings {
+    gap: 16px;
+  }
+  .settings-section h4 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .settings-info {
+    padding: 10px;
+    font-size: 0.88rem;
+  }
+
+  /* شبكة الخطوط — صف واحد، معاينة أصغر */
+  .font-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .font-option {
+    padding: 10px;
+  }
+  .font-preview {
+    font-size: 1.4rem;
+    line-height: 1.7;
+  }
+
+  /* جدول التخزين — يحتاج scroll أفقي لئلا يكسر التخطيط */
+  .storage-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.85rem;
+  }
+  .storage-table th,
+  .storage-table td {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+  .storage-table button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* شبكات التنزيل (روايات، قرّاء) — عمودان فقط */
+  .download-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .download-item-btn {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  .download-item-btn small {
+    font-size: 0.72rem;
+  }
+
+  /* قسم "حول" — مسافات مدمجة */
+  .about-content {
+    gap: 8px;
+  }
+  .about-name {
+    font-size: 1.25rem;
+  }
+  .about-tagline {
+    font-size: 0.95rem;
+  }
+  .about-desc {
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  .about-meta {
+    padding: 10px;
+    font-size: 0.82rem;
+  }
+  .about-meta p {
+    line-height: 1.6;
+  }
+  .about-links {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .about-link {
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  /* settings-row (للتوغل/الـ checkbox) */
+  .settings-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* أزرار التحكم بالحجم العام */
+  .reset-prefs-btn,
+  .download-manager button {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  /* استثناء: أزرار "حذف" داخل الجدول لا تكون 100% عرضاً */
+  .storage-table button {
+    width: auto;
+  }
+
+  /* بانر حالة التنزيل (completed/error/...) — مدمج */
+  .settings-section-job h4 {
+    font-size: 0.95rem;
+  }
+  .progress-info {
+    font-size: 0.85rem;
+  }
+}
+
 .progress-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--success));
@@ -1251,7 +1929,13 @@ input[type='number'] {
   .app-shell.has-session > .page-nav {
     display: none;
   }
-  .app-shell.has-session .floating-btn-pagenav {
+  .app-shell.has-session .floating-btn-pagenav,
+  .app-shell.fullscreen .floating-btn-pagenav {
+    display: none;
+  }
+  /* أثناء تشغيل الصوت على الموبايل: نُخفي زر العلامة لربح مساحة في الشريط.
+     الميزة تبقى متاحة من زر "المزيد" ⋯. */
+  .app-shell.has-session .floating-btn-bookmark {
     display: none;
   }
 }

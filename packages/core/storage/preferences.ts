@@ -12,8 +12,11 @@ const STORAGE_KEY = 'gt-quranreader:prefs';
  * إصدار 4: theme='auto' افتراضياً + إضافة وضع 'gold'.
  * إصدار 5: theme='gold' افتراضياً.
  * إصدار 6: ibrahim-aldosary-warsh افتراضياً (عبد الباسط حُذف لترقيمه غير القياسي).
+ * إصدار 7: إضافة lastReadAt — علامة موضع القراءة اليدوية (مستقلة عن lastStoppedAt للصوت).
+ * إصدار 8: إضافة lastReadPage — صفحة آخر قراءة (تلقائية، تُحفَظ عند التنقل بلا صوت).
+ * إصدار 9: إضافة volume (0..1) — مستوى صوت القارئ.
  */
-export const PREFS_SCHEMA_VERSION = 6;
+export const PREFS_SCHEMA_VERSION = 9;
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   riwaya: 'warsh',
@@ -27,6 +30,9 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   currentPage: 1,
   bookmarks: [],
   lastStoppedAt: null,
+  lastReadAt: null,
+  lastReadPage: 1,
+  volume: 1.0,
   schemaVersion: PREFS_SCHEMA_VERSION,
 };
 

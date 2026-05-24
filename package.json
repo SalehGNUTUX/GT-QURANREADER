@@ -61,7 +61,10 @@
     "clean": "rimraf apps/*/dist apps/*/dist-electron node_modules apps/*/node_modules packages/*/node_modules"
   },
   "devDependencies": {
+    "playwright": "^1.60.0",
+    "playwright-core": "^1.60.0",
     "rimraf": "^6.0.1",
+    "tsx": "^4.22.3",
     "typescript": "^5.7.2"
   }
 }

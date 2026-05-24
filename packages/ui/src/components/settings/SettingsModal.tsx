@@ -1,6 +1,7 @@
-import type { ComponentType } from 'react';
+import { useState, type ComponentType } from 'react';
 import type { UserPreferences } from '@gt-quranreader/core';
 import { Modal } from '../modals/Modal';
+import { ConfirmDialog } from '../modals/ConfirmDialog';
 import { AVAILABLE_FONTS } from '../../fonts/font-catalog';
 
 interface Props {
@@ -20,11 +21,7 @@ export function SettingsModal({
   DownloadManager,
   onResetPreferences,
 }: Props) {
-  const handleReset = () => {
-    if (confirm('سيتم إعادة كل الإعدادات (الرواية، القارئ، الخط، السمة...) إلى القيم الافتراضية. متابعة؟')) {
-      onResetPreferences();
-    }
-  };
+  const [confirmReset, setConfirmReset] = useState(false);
 
   return (
     <Modal title="الإعدادات" onClose={onClose}>
@@ -74,11 +71,69 @@ export function SettingsModal({
             إن لم تظهر مزايا جديدة بعد التحديث، استخدم هذا لإعادة كل الإعدادات للقيم الافتراضية.
             (لا يحذف البيانات المُنزَّلة offline.)
           </p>
-          <button type="button" onClick={handleReset} className="reset-prefs-btn">
+          <button type="button" onClick={() => setConfirmReset(true)} className="reset-prefs-btn">
             ♻️ إعادة الإعدادات الافتراضية
           </button>
         </section>
+
+        <section className="settings-section about-section">
+          <h4>ℹ️ حول البرنامج</h4>
+          <div className="about-content">
+            <p className="about-name">📖 GT-QuranReader</p>
+            <p className="about-tagline">مستعرض و قارئ الذكر الحكيم</p>
+            <p className="about-version">الإصدار 4.0.0 (stable)</p>
+            <p className="about-desc">
+              تطبيق حر مفتوح المصدر لقراءة القرآن الكريم بأربع روايات وأكثر من 13 قارئاً،
+              مع تظليل آية متزامن وبحث ذكي. يعمل على Linux وأندرويد والمتصفح من قاعدة كود واحدة.
+            </p>
+            <div className="about-meta">
+              <p>
+                <strong>المطور:</strong>{' '}
+                <a href="https://github.com/SalehGNUTUX" target="_blank" rel="noopener">SalehGNUTUX</a>
+              </p>
+              <p>
+                <strong>الترخيص:</strong> GPL-3.0 (سطح المكتب) · AGPL-3.0 (الويب)
+              </p>
+              <p>
+                <strong>مصادر البيانات:</strong>
+                <a href="https://alquran.cloud/api" target="_blank" rel="noopener">api.alquran.cloud</a> ·{' '}
+                <a href="https://everyayah.com/" target="_blank" rel="noopener">everyayah.com</a>
+              </p>
+            </div>
+            <div className="about-links">
+              <a href="https://github.com/SalehGNUTUX/GT-QURANREADER" target="_blank" rel="noopener" className="about-link">
+                🐙 المستودع
+              </a>
+              <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/releases" target="_blank" rel="noopener" className="about-link">
+                📦 الإصدارات
+              </a>
+              <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/issues" target="_blank" rel="noopener" className="about-link">
+                🐛 الإبلاغ عن مشكلة
+              </a>
+              <a href="https://github.com/SalehGNUTUX/GT-QURANREADER/blob/main/CHANGELOG.md" target="_blank" rel="noopener" className="about-link">
+                📝 سجل التغييرات
+              </a>
+            </div>
+            <p className="about-dua">🤲 اللهم اجعل هذا العمل صدقة جارية</p>
+          </div>
+        </section>
       </div>
+
+      {confirmReset && (
+        <ConfirmDialog
+          title="إعادة الإعدادات الافتراضية"
+          message={'سيتم إرجاع كل الإعدادات (الرواية، القارئ، الخط، السمة، حجم الخط) إلى القيم الافتراضية.\n\nملاحظة: علاماتك المحفوظة (الإشارات) لن تُحذف.'}
+          confirmLabel="إعادة الضبط"
+          cancelLabel="إلغاء"
+          icon="♻️"
+          variant="danger"
+          onConfirm={() => {
+            setConfirmReset(false);
+            onResetPreferences();
+          }}
+          onCancel={() => setConfirmReset(false)}
+        />
+      )}
     </Modal>
   );
 }

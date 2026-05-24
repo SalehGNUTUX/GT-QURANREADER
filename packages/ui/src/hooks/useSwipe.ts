@@ -1,15 +1,20 @@
 import { useEffect, useRef } from 'react';
 
 interface Options {
-  onSwipeLeft?: () => void; // سحب لليسار → الصفحة التالية (في rtl)
-  onSwipeRight?: () => void; // سحب لليمين → الصفحة السابقة
-  threshold?: number; // الحد الأدنى للمسافة (px)
-  maxVertical?: number; // أقصى انحراف عمودي للقبول
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+  threshold?: number;
+  maxVertical?: number;
 }
 
 /**
- * تتبّع touch gestures على عنصر. يعيد ref يُربط بـ container.
- * يستثني العناصر التي يمكن تمريرها (input/textarea/scroll).
+ * تتبّع touch gestures على document مباشرة (مرحلة capture) دون فلاتر
+ * بنية DOM. هذا يضمن أن أي سحب أفقي صالح يُطلق الـ callback.
+ *
+ * يُستثنى فقط: العناصر الواضحة التي يجب تركها (input/textarea/modal).
+ * لا فلتر .app-shell — لو وصلت الحدث للـ document، نتعامل معها.
+ *
+ * يبعث custom event `gtqr:swipe-fired` عند الإطلاق ليلتقطه GestureDebugOverlay.
  */
 export function useSwipe<T extends HTMLElement = HTMLElement>(options: Options) {
   const ref = useRef<T | null>(null);
@@ -18,43 +23,62 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(options: Options) 
   optsRef.current = options;
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const threshold = options.threshold ?? 60;
-    const maxVertical = options.maxVertical ?? 80;
+    const threshold = options.threshold ?? 30;
+    const maxVertical = options.maxVertical ?? 160;
 
     const onStart = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        startRef.current = null;
+        return;
+      }
       const t = e.touches[0];
       if (!t) return;
+      const target = e.target as HTMLElement | null;
+      // استثناء فقط العناصر التفاعلية المحتمَلة
+      if (target?.closest('input, textarea, .modal-backdrop, .search-results-card')) {
+        startRef.current = null;
+        return;
+      }
       startRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
     };
 
     const onEnd = (e: TouchEvent) => {
       const start = startRef.current;
+      startRef.current = null;
       if (!start) return;
       const end = e.changedTouches[0];
       if (!end) return;
       const dx = end.clientX - start.x;
       const dy = end.clientY - start.y;
       const dt = Date.now() - start.t;
-      startRef.current = null;
 
-      if (dt > 700) return; // سحب بطيء = scroll
-      if (Math.abs(dy) > maxVertical) return; // انحراف عمودي
+      if (dt > 1200) return;
+      if (Math.abs(dy) > maxVertical) return;
       if (Math.abs(dx) < threshold) return;
 
-      const target = e.target as HTMLElement | null;
-      if (target?.closest('input, textarea, button, a, .modal-card, .search-results-card')) return;
+      // إشعار overlay (للتشخيص البصري) أن الـ callback تم إطلاقه فعلاً
+      try {
+        window.dispatchEvent(new CustomEvent('gtqr:swipe-fired', {
+          detail: { direction: dx < 0 ? 'left' : 'right', dx, dy, dt },
+        }));
+      } catch { /* تجاهل */ }
 
       if (dx < 0) optsRef.current.onSwipeLeft?.();
       else optsRef.current.onSwipeRight?.();
     };
 
-    el.addEventListener('touchstart', onStart, { passive: true });
-    el.addEventListener('touchend', onEnd, { passive: true });
+    const onCancel = () => {
+      startRef.current = null;
+    };
+
+    document.addEventListener('touchstart', onStart, { passive: true, capture: true });
+    document.addEventListener('touchend', onEnd, { passive: true, capture: true });
+    document.addEventListener('touchcancel', onCancel, { passive: true, capture: true });
+
     return () => {
-      el.removeEventListener('touchstart', onStart);
-      el.removeEventListener('touchend', onEnd);
+      document.removeEventListener('touchstart', onStart, true);
+      document.removeEventListener('touchend', onEnd, true);
+      document.removeEventListener('touchcancel', onCancel, true);
     };
   }, [options.threshold, options.maxVertical]);
 

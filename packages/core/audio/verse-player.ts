@@ -159,6 +159,15 @@ export class VersePlayer {
     this.audio.pause();
   }
 
+  /** يضبط مستوى الصوت على كل العناصر الصوتية (الحالي + المعزوفات المحضَّرة). */
+  setVolume(v: number): void {
+    const clamped = Math.max(0, Math.min(1, v));
+    this.audio.volume = clamped;
+    for (const a of this.preloadAudios) {
+      if (a) a.volume = clamped;
+    }
+  }
+
   async resume(): Promise<void> {
     const token = ++this.playToken;
     try {

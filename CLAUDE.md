@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project at a glance
 
-GT-QURANREADER v4.0.0 (stable) — Quran reader that ships from **one codebase** to multiple distribution targets:
+GT-QURANREADER v4.0.1 (current stable) — Quran reader that ships from **one codebase** to multiple distribution targets:
 - Linux desktop (Electron): **AppImage · DEB · RPM · Flatpak** via `apps/desktop/`
 - Browser + installable PWA via `apps/web/`
 - **Android APK** (+ iOS) via Capacitor wrapping `apps/web/`
@@ -67,12 +67,23 @@ Final release artifacts (v4.0.0):
 - `release/GT-QURANREADER-4.0.0-x86_64.AppImage` (109 MB)
 - `release/GT-QURANREADER-4.0.0-amd64.deb` (77 MB)
 - `release/GT-QURANREADER-4.0.0-x86_64.rpm` (107 MB)
-- `release/GT-QURANREADER-4.0.0.flatpak` (78 MB)
-- `release/android/GT-QURANREADER-4.0.0-debug.apk` (4.6 MB, signed with Android debug key)
-- `release/android/GT-QURANREADER-4.0.0-unsigned.apk` (4.4 MB, needs `jarsigner` + `zipalign` for Play Store)
+- `release/GT-QURANREADER-4.0.0.flatpak` (77 MB)
+- `release/android/GT-QURANREADER-4.0.0-release.apk` (7.4 MB, **signed with Android debug key** — installable directly via `adb install -r`; this is the recommended APK for end users until Play Store signing happens)
+- `release/android/GT-QURANREADER-4.0.0-debug.apk` (14 MB, debug variant for dev/test)
+- `release/android/GT-QURANREADER-4.0.0-unsigned.apk` (7.3 MB, raw `assembleRelease` output — needs `jarsigner` + `zipalign` for Play Store)
+
+**APK signing recipe** (already automated by the build script for `-release.apk`):
+```bash
+zipalign -p -f -v 4 *-unsigned.apk /tmp/aligned.apk
+apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android \
+  --key-pass pass:android --ks-key-alias androiddebugkey \
+  --out *-release.apk /tmp/aligned.apk
+```
+
+**Android resource bloat warning**: when regenerating splash screens via ImageMagick, the default output is **16-bit PNG** (~8.5 MB total across 10 splashes for the 1280×1920 + 1920×1280 xxxhdpi pair). Always run `optipng -strip all -o2` afterwards — reduces to ~2.7 MB total. `magick ... -depth 8` doesn't fully strip the 16-bit color table; `optipng` does.
 
 Flatpak manifest + AppStream metadata live in `flatpak/`:
-- `com.gnutux.GTQuranReader.yml` — extracts the prebuilt AppImage, copies its squashfs to `/app/lib/gt-quranreader/`, then wraps with `launcher.sh` (passes `--no-sandbox` because Electron's chrome-sandbox doesn't work inside Flatpak's sandbox).
+- `com.gnutux.GTQuranReader.yml` — extracts the prebuilt AppImage, copies its squashfs to `/app/lib/gt-quranreader/`, then wraps with `launcher.sh`. **The launcher's `exec` line must point to `/app/lib/gt-quranreader/@gt-quranreaderdesktop`** (not `gt-quranreader`) — electron-builder produces a binary named after the scoped package name with the slash stripped (`@gt-quranreader/desktop` → `@gt-quranreaderdesktop`). The `--no-sandbox` flag is required because Electron's chrome-sandbox doesn't work inside Flatpak's sandbox.
 - `com.gnutux.GTQuranReader.metainfo.xml` — required by `appstreamcli compose`. Bump `<release version=... date=...>` when releasing.
 - `com.gnutux.GTQuranReader.desktop` — desktop entry with `Name[ar]="عارض و قارئ الذكر الحكيم"`. **The icon source name inside the AppImage's squashfs is `@gt-quranreaderdesktop.png`** (Electron's quirky output naming), not the human-readable name — this is hardcoded in the manifest's icon copy loop. Don't include 1024px (Flatpak max is 512×512).
 
@@ -153,13 +164,18 @@ The mechanism: `playVerse` sets `pendingAfterBasmala = {s, a}`, plays the basmal
 
 ### Preferences + schema versioning
 
-`packages/core/storage/preferences.ts` exports `PREFS_SCHEMA_VERSION` (currently **`6`**). **Bump this by +1 whenever you change `DEFAULT_PREFERENCES` defaults or add fields that should propagate to existing users.** On load:
+`packages/core/storage/preferences.ts` exports `PREFS_SCHEMA_VERSION` (currently **`9`**). **Bump this by +1 whenever you change `DEFAULT_PREFERENCES` defaults or add fields that should propagate to existing users.** On load:
 - If saved `schemaVersion !== current` → discard saved prefs, use defaults, but **keep `bookmarks`** (user data) and write back fresh.
-- This is how we automatically migrated users through: `viewMode: 'image'` → `'text'`, `riwaya: 'hafs'` → `'warsh'`, `reciterId: 'abdulbasit-warsh'` → `'ibrahim-aldosary-warsh'` (after his removal), `theme: 'dark'` → `'gold'`, etc. — all without forcing users to manually clear localStorage.
+- This is how we automatically migrated users through: `viewMode: 'image'` → `'text'`, `riwaya: 'hafs'` → `'warsh'`, `reciterId: 'abdulbasit-warsh'` → `'ibrahim-aldosary-warsh'`, `theme: 'dark'` → `'gold'`, added `lastReadAt`, `lastReadPage`, `volume` — all without forcing users to manually clear localStorage.
 
-Settings modal also has a manual **"إعادة الإعدادات الافتراضية"** button (calls `usePreferences().reset()`).
+Settings modal also has a manual **"إعادة الإعدادات الافتراضية"** button (calls `usePreferences().reset()`) — protected by `ConfirmDialog`.
 
-Current defaults (as of schema version 6): `riwaya='warsh'`, `reciterId='ibrahim-aldosary-warsh'`, `fontId='AmiriQuran'`, `viewMode='text'`, `theme='gold'`, `enableVerseHighlight=true`.
+Current defaults (as of schema version 9): `riwaya='warsh'`, `reciterId='ibrahim-aldosary-warsh'`, `fontId='AmiriQuran'`, `viewMode='text'`, `theme='gold'`, `enableVerseHighlight=true`, `volume=1.0`.
+
+**Three independent position-tracking prefs**:
+- `lastStoppedAt: VerseRef | null` — auto-tracks last audio position. Used by resume-audio dialog.
+- `lastReadAt: VerseRef | null` — manual reading bookmark. Set/cleared explicitly via 🔖/🗑️ button. Displayed with persistent visual marker.
+- `lastReadPage: number` — auto-tracked when user navigates **without active audio**. On startup, `currentPage = lastReadPage` (overrides audio's last page).
 
 ### Position restoration (lastStoppedAt + highlightFromStop)
 
@@ -191,14 +207,29 @@ Used currently for the resume-reading prompt. Props: `title`, `message` (support
 
 CSS in `global.css` reacts to `.app-shell.fullscreen` (hides header/toolbar/page-nav/footer) and `.app-shell.idle` (fades the floating controls).
 
-### Floating controls — auto-extending toolbar
+### Floating controls — minimalist toolbar + popovers
 
-`packages/ui/src/components/controls/FloatingControls.tsx` shows different button counts based on state:
-- No active session: `[prev] [☰] [⛶] [▶] [🔍] [next]` (6 buttons).
-- Active session (any reading): adds **stop ■** button next to play/pause, becomes 7 buttons.
-- The two arrow buttons (`floating-btn-pagenav` class) are hidden on mobile (`max-width: 640px`) when `.app-shell.has-session` is set — auto-advance handles page changes during playback.
+`packages/ui/src/components/controls/FloatingControls.tsx` shows: `[‹] [⛶] [▶/⏸] [■?] [🔖/📖/🗑️?] [خخ?] [📄?] [⋯] [›]`.
 
-The fullscreen button (⛶) is duplicated here on purpose: in fullscreen, the header is hidden so this is the only way out without `Esc`.
+**Smart bookmark button** (inline): only renders when `bookmarkAction` is non-null. Its icon changes per state:
+- `save` (🔖) — no bookmark yet, OR highlighted verse differs from current bookmark (will replace).
+- `goto` (📖) — bookmark exists, no highlighted verse (will navigate + highlight).
+- `remove` (🗑️) — highlighted verse === current bookmark (will clear bookmark).
+
+State machine lives in `App.tsx` `bookmarkAction` computation. The button is **hidden on mobile during audio session** (CSS rule `.app-shell.has-session .floating-btn-bookmark`) to save space — all 3 actions also live in the More menu.
+
+**Two popovers** above the bar (replace inline buttons for compactness):
+- **خخ zoom toggle** → popover with `[＋][－]` for font size. Auto-dismiss on idle/outside-tap.
+- **📄 page-nav toggle (mobile only)** → popover with `[‹][›]`. Backup for swipe gestures.
+
+**More menu (⋯) opens `ToolsMenuModal`** with:
+- ☰ Surah list · 🔍 Search
+- 📜 Riwaya · 🎤 Reciter · 🔤 Font (via new `FontPickerModal`) — show current values inline
+- 🔖/📖/🗑️ Bookmark actions (all 3, conditionally rendered based on hasReadingBookmark)
+- ＋／－ Zoom buttons (keep menu open for multi-tap)
+- 🔉 ━━●━━ 🔊 **Volume slider** (0-100%, 5% steps)
+
+The fullscreen button (⛶) is in the bar on purpose: in fullscreen, the header is hidden so this is the only way out without `Esc`.
 
 ### Riwaya change auto-switches reciter
 
@@ -237,6 +268,28 @@ The renderer detects Electron via `window.gtQuran?.app.isElectron` in `apps/desk
 - `artifactName: "${productName}-${version}-${arch}.${ext}"` — required because the scoped package name `@gt-quranreader/desktop` produces invalid DEB control filenames otherwise.
 - `author` must be an object `{name, email}`, not a string, because DEB requires a maintainer email.
 
+**Critical ESM-vs-CommonJS bug (fixed in v4.0.1)**: Electron's preload script MUST be CommonJS. The compiled `preload.js` was using ESM `import { contextBridge } from 'electron'` → Electron silently failed to inject `window.gtQuran` → app behaved like a browser (no local data, no IPC). The fix:
+- `apps/desktop/electron/tsconfig.json`: `"module": "CommonJS"` (was `"ESNext"`)
+- `apps/desktop/package.json`: **removed** `"type": "module"` (was forcing all .js into ESM)
+- `apps/desktop/electron/main.ts`: replaced `fileURLToPath(import.meta.url)` with bare `__dirname` (CJS global). Imports use bare paths (e.g., `./ipc/data`, not `./ipc/data.js`).
+- Verify the compiled `dist-electron/preload.js` starts with `"use strict"; ... require("electron")` not `import`. If you see `import`, the bug is back.
+
+### Touch gestures (useSwipe + usePinchZoom)
+
+Both hooks live in `packages/ui/src/hooks/`. **Both listen on `document` in capture phase** (not on the returned ref's element) — this is required so events reach our handlers regardless of which inner element gets the touch target. The ref is still returned for backward-compat but isn't strictly needed.
+
+`useSwipe`:
+- Threshold 30px, maxVertical 160px, timeout 1200ms.
+- No `.app-shell` filter (would reject legitimate gestures on edge cases).
+- Excludes only `input, textarea, .modal-backdrop, .search-results-card`.
+- Emits `gtqr:swipe-fired` custom event when callback fires (for `GestureDebugOverlay`).
+
+`usePinchZoom`:
+- `touchmove` with `passive: false` is registered **dynamically** in `touchstart` only when 2 fingers are detected, and removed in `touchend` when fingers drop below 2. This is critical: a permanent non-passive touchmove handler blocks Chrome's native single-finger swipe gesture decision-making.
+- Emits `gtqr:pinch-start` and `gtqr:pinch-fired` events.
+
+**Debug overlay**: append `?debug=gestures` to the URL. `GestureDebugOverlay` registers extra touch listeners on document (capture, all passive) and visually displays touchstart/move/end coordinates, dx/dy/dt, plus the custom-event firings. Essential for diagnosing on real phones where console access is hard.
+
 ### Themes + styling
 
 Themes (in order of preference): **`gold` (default)** · `dark` · `light` · `sepia` · `auto` (follows OS). Each toggles by adding/removing a class on `<html>`. CSS variables live in `packages/ui/src/styles/global.css`. When you add a new theme, also extend the theme picker in `SettingsModal` and the input restyle rules (`input[type='number'|'text'|'search']` get `appearance: none` to look right in every theme).
@@ -244,13 +297,21 @@ Themes (in order of preference): **`gold` (default)** · `dark` · `light` · `s
 ### Web/PWA specifics
 
 `apps/web/vite.config.ts` configures `vite-plugin-pwa` with five Workbox strategies:
-- App shell: precache (~38 entries, ~1.5 MB)
+- App shell: precache (~45 entries, ~2.3 MB)
 - `raw.githubusercontent.com/.../Quran-PNG/...`: CacheFirst, 700 entries, 1y
 - `everyayah.com`: CacheFirst, 6300 entries, 1y
 - `server8.mp3quran.net`: CacheFirst, 200 entries, 1y
 - `api.alquran.cloud`: StaleWhileRevalidate
 
 When you add a new external host, register it here, otherwise it won't work offline.
+
+**Important: SW is intentionally disabled in dev mode** (`devOptions` not set). Enabling it caused HMR to serve stale code → broke gestures/UI updates after every refresh. The dev experience expects no SW; storage table testing requires a production build (surge.sh or APK).
+
+**Explicit Cache API download flow** (since v4.0.1): `DownloadManager.fetchAllConcurrent()` uses `caches.open('gtqr-images')` + `cache.put()` directly, **not** `fetch({cache:'force-cache'})`. This guarantees downloaded files appear in the storage table and work in APK/Capacitor where SW may not be registered. Cache names:
+- `gtqr-images` — all 604 Quran page images
+- `gtqr-audio-{reciterId}` — per-reciter audio (~6240 files)
+
+The `summarizeCaches()` function inspects both these explicit caches AND Workbox's auto-managed ones (`quran-pages-images`, `quran-verse-audio`, etc.), labels them ودودياً، and renders rows in the storage table with individual delete buttons.
 
 Capacitor is initialized in `apps/web/src/platform/capacitor-init.ts`. The Android back button handler closes (in order): open modal → search results → active audio → exit app. If you add a new modal-like UI state, hook it into that chain.
 
@@ -259,6 +320,31 @@ Capacitor is initialized in `apps/web/src/platform/capacitor-init.ts`. The Andro
 ### Legacy code
 
 `_legacy/desktop-bash/` (old v3 Bash + Python http.server) and `apps/web/_legacy/` (old vanilla JS web app) are kept for reference only. Don't import from them and don't update them. They are in `.gitignore` only for the top-level `_legacy/` — `apps/web/_legacy/` is checked in for historical reference.
+
+### Landing page (repo root `index.html`)
+
+A standalone single-file landing page lives at the **repo root** as `index.html` + `logo.png` (the master icon). It is served as `https://salehgnutux.github.io/GT-QURANREADER/` when GitHub Pages is enabled from main. Independent of the apps — uses Tailwind CDN + Font Awesome 6 CDN + Google Fonts (Tajawal + Amiri Quran). **Mirrors the 5-theme palette of the apps** (`gold` default · `dark` · `light` · `sepia` · `auto`) via CSS variables. Theme switching is via `localStorage['gtqr_site_theme']`.
+
+Notes when editing the landing page:
+- The top **verse banner** alternates between two ayat every 10s (Surah At-Taghabun 64:17 + Surah Al-Qamar 54:17) with a 600ms opacity crossfade. Verses are hardcoded in the inline `<script>` as a `VERSES` array.
+- Both top and footer ayat use the `.quran-text` class which loads **Amiri Quran** from Google Fonts. Don't switch to Tajawal for ayat — diacritics render incorrectly.
+- The primary "جرّب نسخة الويب (v4)" button points to **`./app/`** (relative) — resolves to `https://salehgnutux.github.io/GT-QURANREADER/app/` on Pages. The `app/` folder is the built PWA (output of `npm run build:web` copied from `apps/web/dist/`). Below the primary CTAs there are **two small secondary links**: a **Surge.sh backup** (`gt-quranreader.surge.sh` — independent mirror, rebuild via `cd .../GT-QURANREADER-WEB-surge && surge`) and the **v3 legacy** site at `salehgnutux.github.io/GT-QURANREADER-WEB/`.
+- 5 download cards link directly to `github.com/SalehGNUTUX/GT-QURANREADER/releases/download/GT-QURANREADER-4.0.0/...`. Update the version segment when releasing.
+- Sepia theme on the landing page is **intentionally darker** than the app's sepia (`#c9b78f` bg vs the app's `#e8dcc0`) per user preference — they read on a laptop screen and the brighter sepia was hard on the eyes.
+
+### Release docs
+
+`RELEASE-v4.0.1.md` (and earlier `RELEASE-v4.0.0.md`) at repo root are canonical release notes. Each contains: download table with sizes · install commands per format · features summary · SHA-256 checksums (also in `release/SHA256SUMS`) · known limitations · license info. Copy the body of the relevant file into the GitHub Release form's description when publishing.
+
+### Web ↔ Desktop sync points (synced 2026-05-24)
+
+Both apps have been audited to be feature-parity except for the intentional platform divergences listed under "Two extension points where apps differ". Currently synced and identical:
+- `isOnline` badge in the header (`apps/{desktop,web}/src/App.tsx`) — both listen to `window` online/offline events.
+- `DownloadManager`'s full reciter list (no Web-specific `.slice(0, 8)` truncation).
+- `DownloadManager`'s "حذف كل البيانات" master button (Desktop iterates `storage` sections; Web wipes all caches + IndexedDB).
+- `<meta name="description">` in both `index.html`s.
+
+When adding a new state/effect/handler to one app's `App.tsx`, **mirror it in the other unless it's genuinely platform-specific** (e.g., Capacitor back button handler — Web-only). The 90% shared code surface relies on this discipline.
 
 ## Project conventions worth knowing
 

@@ -124,8 +124,14 @@ export interface UserPreferences {
   autoPlayNext: boolean;
   currentPage: number;
   bookmarks: Bookmark[];
-  /** آخر آية كانت مظللة/متوقفة عندها القراءة (يُسترد عند فتح التطبيق). */
+  /** آخر آية كانت مظللة/متوقفة عندها القراءة الصوتية (يُحفَظ تلقائياً مع التشغيل). */
   lastStoppedAt: VerseRef | null;
+  /** علامة موضع القراءة اليدوية — يضعها المستخدم صراحةً بزر "احفظ موضع قراءتي". */
+  lastReadAt: VerseRef | null;
+  /** آخر صفحة وصل لها المستخدم في وضع القراءة (يُحدَّث تلقائياً عند التنقل بدون صوت). */
+  lastReadPage: number;
+  /** مستوى الصوت 0..1 (افتراضي 1.0). */
+  volume: number;
   /** يُستخدم لإجبار تطبيق الإعدادات الافتراضية الجديدة عند ترقية schema. */
   schemaVersion: number;
 }
